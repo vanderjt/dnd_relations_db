@@ -66,7 +66,7 @@ class GraphRenderer:
         self.edge_artists, self.edge_labels, self.node_labels, self.curves = {}, {}, {}, {}
         self.nodes = list(graph)
         if not graph:
-            self.axes.text(.5, .5, "No characters in this view.\nChoose a focus or adjust the filters.",
+            self.axes.text(.5, .5, "No characters shown.\nCheck focus and filters.",
                            ha="center", va="center", color=self.colors["muted"], transform=self.axes.transAxes,
                            fontsize=text_size)
             self.fit_limits = ((-1, 1), (-1, 1))

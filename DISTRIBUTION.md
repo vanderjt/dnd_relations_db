@@ -1,3 +1,5 @@
+> 0.19.0 adds curated HAS artwork, Illustrated/Minimal appearance, compact navigation and responsive workspaces. Imported portraits remain visible in Minimal. Help → Artwork credits includes the original licenses. Schema 13 and portable format 9 are unchanged.
+
 > 0.18.0 advances immediately from searchable starting-character cards to connections. A persistent source card and Change character action preserve context, entered details, and compatible targets. Keyboard activation, graph selection, and recovered drafts share this flow.
 
 > 0.17.0 replaces Simple connection entry with Starting character → Other characters → Relationship → Review. Direct choices, consistent graph clicks, early validation, and preserved Back navigation reduce selection mistakes.
@@ -10,15 +12,15 @@
 
 > 0.14.1 simplifies graph labels: no numeric IDs beside names or relationships, and no redundant Dot/Link prefixes in the plotted legend.
 
-> Try **Story → Try the modern prometheus…** for a complete Frankenstein example,
-> or **Story → Try expanded Greyhaven sample…** for the updated original.
-> Each creates a fresh local story. Use **Legend · dots & links** and
+> Try **Story → Sample stories → The modern prometheus…** for a complete Frankenstein example,
+> or **Story → Sample stories → Expanded Greyhaven…** for the updated original.
+> Each creates a fresh local story. Use **View → Legend · dots & links** and
 > **More → Saved graph views…** to explore colors and guided scenes.
 
-> Latest release: **0.18.0**, schema **13**, portable format **9**.
-> [Combined legend and worked examples release](docs/reviews/2026-09-24/EXAMPLES_REPORT.md) supersedes the package identities below.
+> Latest source release: **0.19.0**, schema **13**, portable format **9**. The GUI overhaul release report records package verification separately; historical hashes below do not identify this release.
+> [GUI overhaul review records](docs/reviews/gui-overhaul/) contain current staged verification. [Combined legend and worked examples release](docs/reviews/2026-09-24/EXAMPLES_REPORT.md) and package identities below are historical.
 
-> Latest source release: Story Atlas 0.11.0, schema 10, export format 6.
+> Historical source release: Story Atlas 0.11.0, schema 10, export format 6.
 > See [Simple rework completion report](docs/reviews/2026-09-24/SIMPLE_REWORK_COMPLETION_REPORT.md)
 > for the replacement package, verification results and limitations. Earlier hashes below are historical.
 

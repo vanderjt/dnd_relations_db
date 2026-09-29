@@ -6,7 +6,10 @@ from tkinter import ttk, filedialog, messagebox
 from .backup import publish_database
 from .database import Database
 from .simple_event import create_chapter_event
-from .widgets import wrapping_label
+from .widgets import wrapping_label, ActionBar
+from .scroll_frame import ScrollFrame
+from .ui_assets import decorate
+from .theme import style_tree
 
 
 def create_story(destination, title, chapter='Chapter 1', event='Opening scene'):
@@ -47,9 +50,14 @@ class StorySetup(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
         self.geometry('480x400')
+        self.minsize(360, 280)
         self.custom_path = None
-        body = ttk.Frame(self, padding=16)
-        body.pack(fill='both', expand=True)
+        bar = ActionBar(self)
+        bar.pack(side='bottom', fill='x', padx=16, pady=10)
+        self.scroller = ScrollFrame(self)
+        self.scroller.pack(fill='both', expand=True, padx=16, pady=12)
+        body = self.scroller.content
+        decorate(ttk.Label(body, text='Start a story', style='Heading.TLabel'), 'section.story').pack(anchor='w', pady=(0, 8))
         self.fields = [tk.StringVar(self, value) for value in ('', 'Chapter 1', 'Opening scene')]
         ttk.Label(body, text='Story title').pack(anchor='w')
         entry = ttk.Entry(body, textvariable=self.fields[0])
@@ -74,12 +82,11 @@ class StorySetup(tk.Toplevel):
             else:
                 opening.pack(fill='x', after=customize)
         customize = ttk.Button(body, text='Customize opening ▸', command=toggle)
+        self.customize_button = customize
         customize.pack(anchor='w', pady=8)
         for label, variable in zip(('First chapter', 'Initial event'), self.fields[1:]):
             ttk.Label(opening, text=label).pack(anchor='w')
             ttk.Entry(opening, textvariable=variable).pack(fill='x')
-        bar = ttk.Frame(body)
-        bar.pack(side='bottom', fill='x')
         def save():
             update()
             try:
@@ -92,6 +99,8 @@ class StorySetup(tk.Toplevel):
             completed(result)
         self.save = save
         self.change_location = change
-        ttk.Button(bar, text='Create story', command=save).pack(side='left', pady=12)
-        ttk.Button(bar, text='Cancel', command=self.destroy).pack(side='right', pady=12)
+        self.create_button = bar.add(ttk.Button(bar, text='Create story', command=save, style='Primary.TButton'))
+        self.cancel_button = bar.add(ttk.Button(bar, text='Cancel', command=self.destroy, style='Secondary.TButton'))
+        self.bind('<Escape>', lambda _: self.destroy())
+        style_tree(self)
         entry.focus_set()

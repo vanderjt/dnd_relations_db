@@ -23,7 +23,7 @@ class RecoveryDialog(tk.Toplevel):
         bottom.pack(side="bottom", fill="x")
         ttk.Button(bottom, text="Close", command=self.destroy).pack(side="right")
         wrapping_label(bottom, textvariable=self.status, style="Muted.TLabel").pack(fill="x")
-        tabs = ttk.Notebook(self)
+        tabs = self.tabs = ttk.Notebook(self)
         tabs.pack(fill="both", expand=True, padx=12, pady=12)
         self.pages = {}
         for name in ("Backups & import", "Trash", "Drafts"):
@@ -31,31 +31,39 @@ class RecoveryDialog(tk.Toplevel):
             tabs.add(page, text=name)
             self.pages[name] = page
         page = self.pages["Backups & import"]
-        wrapping_label(page, text="Restore and import create a NEW database. Your current story is never overwritten.").pack(fill="x")
+        wrapping_label(page, text="Restore or import into a new story file.", style='Muted.TLabel').pack(fill="x")
         bar = ActionBar(page)
         bar.pack(fill="x")
-        for label, command in (("Back up now", self.backup), ("Restore selected", self.restore_selected),
-                               ("Browse backup…", self.browse_backup), ("Import JSON…", self.import_json)):
-            bar.add(ttk.Button(bar, text=label, command=lambda command=command: self.run(command)))
-        self.backups = table(page, {"name": "Backup (UTC timestamp)"})
+        bar.add(ttk.Button(bar, text='Back up now', command=lambda: self.run(self.backup), style='Primary.TButton'))
+        self.restore_backup_button = bar.add(ttk.Button(bar, text='Restore selected', command=lambda: self.run(self.restore_selected)))
+        more = bar.add(ttk.Menubutton(bar, text='More'))
+        menu = tk.Menu(more, tearoff=False)
+        menu.add_command(label='Browse backup…', command=lambda: self.run(self.browse_backup))
+        menu.add_command(label='Import JSON…', command=lambda: self.run(self.import_json))
+        more.configure(menu=menu)
         retention = ActionBar(page)
-        retention.pack(fill="x")
-        retention.add(ttk.Label(retention, text="Automatic backups to keep"))
+        retention.pack(side='bottom', fill="x")
+        retention.add(ttk.Label(retention, text="Keep automatic backups"))
         self.retention = tk.StringVar(value=str(app.settings.values["backup_retention"]))
         retention.add(ttk.Spinbox(retention, from_=1, to=100, width=5, textvariable=self.retention))
         retention.add(ttk.Button(retention, text="Save retention", command=lambda: self.run(self.save_retention)))
+        self.backups = table(page, {"name": "Backup (UTC timestamp)"})
         for name in ("Trash", "Drafts"):
             page = self.pages[name]
             text = ("Restore characters first. Connections return when both endpoints are active; conflicts remain in Trash."
                     if name == "Trash" else "Recovery drafts are not committed profiles. Recover to review, then Save changes to commit.")
             wrapping_label(page, text=text).pack(fill="x")
+        self.restore_trash_button = ttk.Button(self.pages["Trash"], text="Restore selected", command=lambda: self.run(self.restore_trash), style='Primary.TButton')
+        self.restore_trash_button.pack(side='bottom', anchor="w")
         self.trash = table(self.pages["Trash"], {"type": "Type", "label": "Item", "time": "Deleted (UTC)"})
-        ttk.Button(self.pages["Trash"], text="Restore selected", command=lambda: self.run(self.restore_trash)).pack(anchor="w")
-        self.drafts = table(self.pages["Drafts"], {"name": "Task draft", "time": "Saved (UTC)"})
         draft_bar = ActionBar(self.pages["Drafts"])
-        draft_bar.pack(fill="x")
-        draft_bar.add(ttk.Button(draft_bar, text="Recover selected", command=lambda: self.run(self.recover_draft)))
-        draft_bar.add(ttk.Button(draft_bar, text="Discard selected", style="Danger.TButton", command=lambda: self.run(self.discard_draft)))
+        draft_bar.pack(side='bottom', fill="x")
+        self.recover_button = draft_bar.add(ttk.Button(draft_bar, text="Recover selected", command=lambda: self.run(self.recover_draft), style='Primary.TButton'))
+        self.discard_button = draft_bar.add(ttk.Button(draft_bar, text="Discard selected", style="Danger.TButton", command=lambda: self.run(self.discard_draft)))
+        self.drafts = table(self.pages["Drafts"], {"name": "Task draft", "time": "Saved (UTC)"})
+        for tree in (self.backups, self.trash, self.drafts):
+            tree.bind('<<TreeviewSelect>>', self.update_actions, add='+')
+        self.bind('<Escape>', lambda _: self.destroy())
         self.refresh()
         style_tree(self)
 
@@ -79,6 +87,14 @@ class RecoveryDialog(tk.Toplevel):
         for index, row in enumerate(self.draft_items):
             self.drafts.insert("", "end", iid=str(index), values=(row["values"].get("name") or row["values"].get("task") or "Unnamed character", row["updated_at"]))
         self.status.set(f"{len(self.backup_paths)} backups · {len(self.trash_items)} Trash items · {len(self.draft_items)} drafts")
+        self.update_actions()
+
+    def update_actions(self, _event=None):
+        for tree, buttons in ((self.backups, (self.restore_backup_button,)),
+                              (self.trash, (self.restore_trash_button,)),
+                              (self.drafts, (self.recover_button, self.discard_button))):
+            for button in buttons:
+                button.state(['!disabled' if tree.selection() else 'disabled'])
 
     def save_retention(self):
         value = int(self.retention.get())

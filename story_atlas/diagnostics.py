@@ -6,12 +6,16 @@ import sys
 import tempfile
 import traceback
 import sqlite3
+import hashlib
 from unittest.mock import patch
 
 
 def run(data_folder, report_path):
     report = dict(ok=False, frozen=bool(getattr(sys, "frozen", False)), python=sys.version, platform=platform.platform())
     app = None
+    callback_errors = []
+    def record_callback(kind, value, trace):
+        callback_errors.append(''.join(traceback.format_exception(kind, value, trace)))
     try:
         from PIL import Image
         import matplotlib
@@ -30,6 +34,7 @@ def run(data_folder, report_path):
             folder = Path(temporary)
             settings_path = folder / 'settings.json'
             welcome = Welcome(folder, Settings(settings_path))
+            welcome.report_callback_exception = record_callback
             with patch('story_atlas.onboarding.filedialog.asksaveasfilename', return_value=str(folder / 'new.db')):
                 setup = welcome.start_empty()
                 setup.fields[0].set('Packaged new story')
@@ -46,6 +51,7 @@ def run(data_folder, report_path):
             assert second_sample != story and second_sample != new_path
             Settings(settings_path).save(mode='Advanced')
             app = StoryAtlas(story, settings_path=settings_path)
+            app.report_callback_exception = record_callback
             app.withdraw()
             app.update()
             assert len(app.database.characters()) == 18
@@ -57,6 +63,31 @@ def run(data_folder, report_path):
             assert f'Active database schema: {CURRENT_VERSION}' in identity
             assert (mode == 'Packaged') == bool(getattr(sys, 'frozen', False))
             assert len(fingerprint) == 64
+            # Decorative fallback is useful at runtime, but must not hide a broken package.
+            from .ui_assets import cache_for, decorate, refresh_illustrations
+            from tkinter import ttk
+            catalog_folder = resource('ui')
+            catalog = json.loads((catalog_folder / 'manifest.json').read_text(encoding='utf-8'))
+            assert len(catalog['assets']) == 30
+            for asset in catalog['assets'].values():
+                asset_path = (catalog_folder / asset['path']).resolve()
+                assert asset_path.is_relative_to(catalog_folder.resolve())
+                assert hashlib.sha256(asset_path.read_bytes()).hexdigest() == asset['source_sha256']
+                assert (catalog_folder / asset['license']).read_text(encoding='utf-8-sig').strip()
+            assert set(catalog['aliases'].values()) <= set(catalog['assets'])
+            art_cache = cache_for(app)
+            assert art_cache.get('section.story') is not None
+            assert art_cache.get('welcome', 48) is not None
+            art_probe = decorate(ttk.Label(app, text='Artwork diagnostic'), 'section.story')
+            assert art_probe.atlas_art_image is not None
+            app.set_appearance('dark', 10, 'Minimal')
+            assert art_probe.atlas_art_image is None
+            assert Settings(settings_path).values['illustrations'] == 'Minimal'
+            app.set_appearance('dark', 10, 'Illustrated')
+            assert art_probe.atlas_art_image is not None
+            art_probe.destroy()
+            report['ui_manifest_sha256'] = hashlib.sha256((catalog_folder / 'manifest.json').read_bytes()).hexdigest()
+            report['ui_asset_count'] = len(catalog['assets'])
             first_event = app.database.events.list()[0]
             app.events.reveal_event(first_event['id'], app.database.path)
             entry = app.events.connect_characters()
@@ -139,6 +170,16 @@ def run(data_folder, report_path):
             Image.new("RGB", (32, 32), "teal").save(portrait)
             reference = app.database.assets.import_image(portrait)
             assert app.database.assets.thumbnail(reference) is not None
+            from .illustrated_widgets import IdentityHeader
+            identity_probe = IdentityHeader(app)
+            assert identity_probe.show_portrait(app.database.assets, reference) is not None
+            photo_before = identity_probe.photo
+            app.set_appearance('light', 10, 'Minimal')
+            assert identity_probe.photo is photo_before
+            assert identity_probe.portrait.cget('image')
+            assert Settings(settings_path).values['illustrations'] == 'Minimal'
+            app.set_appearance('dark', 10, 'Illustrated')
+            identity_probe.destroy()
             backup = snapshot(app.database.connection, story)
             restored = Database(restore_backup(backup, folder / "restored.db"))
             assert len(restored.characters()) == 18
@@ -248,6 +289,7 @@ def run(data_folder, report_path):
             assert doomed not in {row['id'] for row in app.database.characters()}
             assert app.undo_controls.change(True)
             assert attached <= {row['id'] for row in app.database.relationship_records()}
+            assert not callback_errors, '\n'.join(callback_errors)
             report.update(tcl=app.tk.call('info', 'patchlevel'), tk=app.tk.call('package', 'provide', 'Tk'),
                           tcl_library=app.tk.call('info', 'library'), matplotlib_data=matplotlib.get_data_path(),
                           matplotlib_cache=matplotlib.get_cachedir(), icon=str(icon), data_root=str(data_folder),
@@ -255,6 +297,8 @@ def run(data_folder, report_path):
                           schema=CURRENT_VERSION,
                           checks=['new-story first launch and reopen', 'separate expanded sample stories',
                                   'full app startup', 'About identity and active schema', 'Goals and Chapters',
+                                  '30 bundled UI asset hashes and licenses', 'icon and building Tk cache',
+                                  'Illustrated/Minimal persistence and retained imported portrait',
                                   'contextual relationship entry and batch reset', 'TkAgg render and fonts',
                                   'event creation reveal and searchable participant retention',
                                   'contained record-review-correction task', 'Event-Graph-Profile return navigation',
