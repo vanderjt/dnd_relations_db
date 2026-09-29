@@ -1,0 +1,888 @@
+{
+  "version": 1,
+  "author": "Aleksandr Makarov",
+  "assets": {
+    "motif.book1": {
+      "path": "icons/book1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 1.png",
+      "source_sha256": "f258395d679aec9178450b14f14e5acbfab8622323d94e59bcb6efcc39aa2bd3",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Red book with a gold star",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.book2": {
+      "path": "icons/book2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 2.png",
+      "source_sha256": "4f91931205a22d4d82e27d063d328868319125ab3aad789f647cb07aad16118e",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Orange book with gold bands",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.book3": {
+      "path": "icons/book3.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 3.png",
+      "source_sha256": "a963d10dedf35f8fd8280d879253a584bccee91287708206ed077d6b529eb1d4",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Dark red book with gold ornament",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.book4": {
+      "path": "icons/book4.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 4.png",
+      "source_sha256": "3bdf865a37f854adf139f4791ded637b1f17fe40be25ca03d8cdd13d65ce12cc",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Blue book with silver diamond",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.book5": {
+      "path": "icons/book5.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 5.png",
+      "source_sha256": "1de04afc35331e7ab1fe35e77d25a93496eef747fd02d91e670b8066ba604e39",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Violet book with silver sun",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.book6": {
+      "path": "icons/book6.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Book/BookOrigin/BookOrigin 6.png",
+      "source_sha256": "335f3993f49050def8c4d21a4811f47ec39e702a7b7735e5a6071c845322b96b",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Red book with gold pillars",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.artifact1": {
+      "path": "icons/artifact1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Artifact/ArtifactOriginal/ArtifactOriginal 1.png",
+      "source_sha256": "e68a14a23ec64c7335ab0d7b01e91cac91bd38818171adf5b8652d226692641f",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Silver crossed ornamental talisman",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.artifact2": {
+      "path": "icons/artifact2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Artifact/ArtifactOriginal/ArtifactOriginal 2.png",
+      "source_sha256": "8bfb533d10c7c468f3cb53996d47a1448b3bb42aadbc771cdd742b3e0787cf6d",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Red and violet patterned talisman",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.artifact3": {
+      "path": "icons/artifact3.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Artifact/ArtifactOriginal/ArtifactOriginal 3.png",
+      "source_sha256": "5ab7ab37162ab490a4f7ad26ead5d5547905362c4c80ad24704b487f2f6c4acd",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Blue gem on an orange pendant",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.artifact4": {
+      "path": "icons/artifact4.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Artifact/ArtifactOriginal/ArtifactOriginal 4.png",
+      "source_sha256": "69923c8e02bd5671b1036cfa7e1ca432ad001bcedbf24c88f55dde9bfedc2211",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Green clustered gem",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.key1": {
+      "path": "icons/key1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Key/KeyOrigin/KeyOrigin 1.png",
+      "source_sha256": "caab357983a4b6d9431353ca6e57bf6cf60a2e204cc4c0a8f4d6f790da9fd05e",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Bronze key",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.key2": {
+      "path": "icons/key2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Key/KeyOrigin/KeyOrigin 2.png",
+      "source_sha256": "53749d17a55f4051f63da882c22bf0ffeea69cbd7891140d244d149dc280a3b2",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Red key",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.key3": {
+      "path": "icons/key3.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Miscellaneous/Key/KeyOrigin/KeyOrigin 3.png",
+      "source_sha256": "f9c89d3aaea8da90ad0461e58309db91cdf1f4fb55a21719ff161ace423be28f",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Blue key",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.ring1": {
+      "path": "icons/ring1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Ring/RingOriginal/RingOriginal 1.png",
+      "source_sha256": "0c676fb443a7381c57782e9a791ed979e8f74abc00d727ba6b6f0c2aa0616aeb",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Gold band",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.ring2": {
+      "path": "icons/ring2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Ring/RingOriginal/RingOriginal 2.png",
+      "source_sha256": "f55ae42bcdc33e6ee57b65ea2db05ade3535750d44c56b65ccd2252a494eca7f",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Silver band",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.ring3": {
+      "path": "icons/ring3.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Ring/RingOriginal/RingOriginal 3.png",
+      "source_sha256": "402892cf4f2759c32cf240eaa93f4452b46ce02fb9efa58841482313e5e5e4ac",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Broad pale gold band",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.shield1": {
+      "path": "icons/shield1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Shield/ShieldOriginal/ShieldOriginal 1.png",
+      "source_sha256": "7151c8d6111e67afece96723e17994f1df4b574c0a72523ed47d02f95ed25d30",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Layered gold shield with red rim",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.shield2": {
+      "path": "icons/shield2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Shield/ShieldOriginal/ShieldOriginal 2.png",
+      "source_sha256": "95f05c0913119dc03901653e8fc508eb335357adf0e0735f07aeaf4b2f29253d",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Narrow violet shield",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.shield3": {
+      "path": "icons/shield3.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Shield/ShieldOriginal/ShieldOriginal 3.png",
+      "source_sha256": "2a76d96a11c0fcc7d96306dc9875feda9c01b5f44f28dc32f8df6a258e1fd034",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Blue and silver pointed shield",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.cape1": {
+      "path": "icons/cape1.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Cape/CapeOriginal/CapeOriginal 1.png",
+      "source_sha256": "c9205d4d477b1481bdca4279d1adeeb0a116f114e7fbd8323688d1ae26956df9",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Gold-edged dark cape",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "motif.cape2": {
+      "path": "icons/cape2.png",
+      "source_pack": "HAS IconPack (v.1.2)",
+      "source_path": "IconPack 1.0/AllItems/Cape/CapeOriginal/CapeOriginal 2.png",
+      "source_sha256": "9cdff5b4dd603b77df469abf4d9a81982a6187bd45cd52f84a4bdd241975e7bb",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Red cape with pale clasp",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-icons.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.library": {
+      "path": "illustrations/library.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/Library.png",
+      "source_sha256": "8b77fc6cbbe7f4886324347af80f6a08ee274916797a2ba985d63ccd74412f78",
+      "crop": null,
+      "native_size": [
+        48,
+        32
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Library",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.arcanelibrary": {
+      "path": "illustrations/arcanelibrary.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/ArcaneLibrary.png",
+      "source_sha256": "5f1c3fb97879e76fc336841227a91b209956dff37e12d539eaa4d957c1c541e0",
+      "crop": null,
+      "native_size": [
+        32,
+        32
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "ArcaneLibrary",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.fort": {
+      "path": "illustrations/fort.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/Fort.png",
+      "source_sha256": "4504349fc8ce8ebc4ef842c040fefacc73ca87c7dc144d9745d18ffc5c501c3d",
+      "crop": null,
+      "native_size": [
+        32,
+        32
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Fort",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.fountain": {
+      "path": "illustrations/fountain.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/Fountain.png",
+      "source_sha256": "d201c7ff84d872d192a1dd12329e28fad5ab9d92c46b93d74afbda8f32316460",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Fountain",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.gazebo": {
+      "path": "illustrations/gazebo.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/Gazebo.png",
+      "source_sha256": "ffdc74fc673b55ff5a168535438cf732a30c14f9a0d8c83e7d545ca79ebefeb3",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Gazebo",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.rallyflag": {
+      "path": "illustrations/rallyflag.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/RallyFlag.png",
+      "source_sha256": "5b350099c6651cd47556af4beb78c918bac935d017b218b23ae7f16cd09e0875",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "RallyFlag",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.learningstone": {
+      "path": "illustrations/learningstone.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/LearningStone.png",
+      "source_sha256": "21853e9429022664af34f29ff691b9bfb207ed62b77d755e801c2ead333596eb",
+      "crop": null,
+      "native_size": [
+        16,
+        16
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "LearningStone",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.armorsmith": {
+      "path": "illustrations/armorsmith.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/Armorsmith.png",
+      "source_sha256": "1e7186f0b83d4df23e4cc2fcea385ea058fd53224dddf0c4d0785c91db94e4d8",
+      "crop": null,
+      "native_size": [
+        32,
+        32
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "Armorsmith",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    },
+    "building.beastmasterhut": {
+      "path": "illustrations/beastmasterhut.png",
+      "source_pack": "HAS Buildings Pack 1.01",
+      "source_path": "HAS Buildings Pack/AttributeModifier/BeastmasterHut.png",
+      "source_sha256": "a3afab4384cf206d3de8f3141f841f3c5426c5b6fe728aa2c08ef5db38360bda",
+      "crop": null,
+      "native_size": [
+        32,
+        32
+      ],
+      "variants": [
+        "native"
+      ],
+      "roles": [
+        "decoration"
+      ],
+      "description": "BeastmasterHut",
+      "author": "Aleksandr Makarov",
+      "license": "licenses/has-buildings.txt",
+      "distribution_review": "Selected artwork incorporated into Story Atlas; do not redistribute as an asset pack.",
+      "fallback": null,
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "states": [
+        "normal"
+      ]
+    }
+  },
+  "aliases": {
+    "section.identity": "motif.book1",
+    "section.story": "motif.book2",
+    "section.goals": "motif.key1",
+    "section.abilities": "motif.artifact1",
+    "section.inventory": "motif.shield1",
+    "section.notes": "motif.book3",
+    "section.chapter": "motif.book4",
+    "section.event": "motif.book5",
+    "welcome": "building.library",
+    "empty.story": "building.gazebo"
+  }
+}

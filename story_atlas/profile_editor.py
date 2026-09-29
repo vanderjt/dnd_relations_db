@@ -8,6 +8,8 @@ from .models import PROFILE_FIELDS
 from .profile_templates import TEMPLATES
 from .scroll_frame import ScrollFrame
 from .widgets import text_area, wrapping_label, ActionBar
+from .illustrated_widgets import IllustratedLabel
+from .ui_assets import decorate
 
 
 class ProfileEditor(ttk.Frame):
@@ -42,7 +44,7 @@ class ProfileEditor(ttk.Frame):
         templates.add(ttk.Button(templates, text="Add writing prompts for this type", style="Secondary.TButton", command=self.apply_template))
         self.template_status = tk.StringVar(self)
         wrapping_label(body, textvariable=self.template_status, style="Muted.TLabel").pack(fill="x")
-        ttk.Label(body, text="Identity", style="Heading.TLabel").pack(anchor="w", pady=(12, 6))
+        IllustratedLabel(body, 'section.identity', text="Identity").pack(fill='x', pady=(12, 6))
         for field in ("name", "character_type", "role", "species", "status", "faction", "location", "tags"):
             if field in self.fields:
                 continue
@@ -83,6 +85,7 @@ class ProfileEditor(ttk.Frame):
                                 ("Inventory", ("inventory",)), ("Notes", ("notes",))):
             section_key = section.casefold()
             header = ttk.Button(body, text=f"{section} ▾", command=lambda key=section_key: self.toggle_section(key))
+            decorate(header, f'section.{section_key}', 24)
             header.pack(anchor="w", pady=(18, 6))
             section_body = ttk.Frame(body)
             section_body.pack(fill="x")

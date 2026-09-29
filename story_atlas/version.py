@@ -13,6 +13,7 @@ def source_fingerprint(root=None):
     root = Path(root) if root is not None else Path(__file__).resolve().parents[1]
     digest = hashlib.sha256()
     files = [root / "main.py", *sorted((root / "story_atlas").glob("*.py"))]
+    files.extend(sorted(path for path in (root / 'story_atlas/resources/ui').rglob('*') if path.is_file()))
     for path in files:
         digest.update(path.relative_to(root).as_posix().encode("utf-8"))
         digest.update(b"\0")

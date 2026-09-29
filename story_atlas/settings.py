@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 DEFAULTS = {"mode": "Advanced", "theme": "dark", "text_size": 10, "roster_width": 280, "relationship_roster_width": 260, "graph_inspector_width": 300, "backup_retention": 7, "recent_stories": [], "last_story": "", "dismissed_guidance": []}
+DEFAULTS['illustrations'] = 'Illustrated'
 
 
 class Settings:
@@ -12,6 +13,8 @@ class Settings:
         try:
             saved = json.loads(self.path.read_text(encoding="utf-8"))
             if isinstance(saved, dict):
+                if saved.get('illustrations') in ('Illustrated', 'Minimal'):
+                    self.values['illustrations'] = saved['illustrations']
                 if saved.get("mode") in ("Simple", "Advanced"):
                     self.values["mode"] = saved["mode"]
                 if isinstance(saved.get("last_story"), str) and "\0" not in saved["last_story"]:

@@ -189,13 +189,18 @@ class StoryAtlas(tk.Tk):
             self.backup_timer = None
         super().destroy()
 
-    def set_appearance(self, mode, size):
+    def set_appearance(self, mode, size, illustrations=None):
+        illustrations = illustrations or self.settings.values.get('illustrations', 'Illustrated')
+        if illustrations not in ('Illustrated', 'Minimal'):
+            raise ValueError('Choose Illustrated or Minimal')
         try:
-            self.settings.save(theme=mode, text_size=size)
+            self.settings.save(theme=mode, text_size=size, illustrations=illustrations)
         except OSError as error:
             messagebox.showerror("Cannot save appearance", str(error), parent=self)
             return
         apply_theme(self, mode, size)
+        from .ui_assets import refresh_illustrations
+        refresh_illustrations(self)
         self.update_idletasks()
         self.graph.invalidate(appearance=True)
         self.graph.controls.reflow()
