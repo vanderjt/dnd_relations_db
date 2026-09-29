@@ -1,7 +1,9 @@
 # GUI overhaul release verification
 
-Status: implemented and locally validated on `gui-overhaul/04-support-release`;
-ready for final independent evidence review and integration into `gui_overhaul`.
+Status: implemented, independently reviewed, locally validated, and integrated
+through [PR #4](https://github.com/vanderjt/dnd_relations_db/pull/4) into
+`gui_overhaul`. Merge `d73936ba6913ecd7e8f669435fa48b46d301d6fc` was pulled locally;
+the post-pull source identity still matches the verified package.
 
 Story Atlas **0.19.0** source identity:
 `98bb3cce5bcbfee253c0ebcc7ea91b2a68e345a64057115cebdbb0376f138573`.

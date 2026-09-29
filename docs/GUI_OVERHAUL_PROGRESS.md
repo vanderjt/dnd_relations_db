@@ -21,7 +21,7 @@ and focus interference. All test stories/settings are disposable.
 | `gui-overhaul/01-foundation` | Curated assets, provenance, image cache, shared components, character pilot, validation capture tool | Merged PR #1; 233 tests passed; pulled `aacf783` |
 | `gui-overhaul/02-navigation` | Header, menus, Simple toolbar, Advanced navigation, help references | Merged PR #2; 237 tests passed; pulled `6ddb63c` |
 | `gui-overhaul/03-workspaces` | Roster/search, relationship details, chronology, graph inspector | Merged PR #3; 248 tests passed; pulled `add06e8` |
-| `gui-overhaul/04-support-release` | Welcome, setup, appearance/credits, support screens, release verification and packaging | Validated; awaiting reviewed PR integration |
+| `gui-overhaul/04-support-release` | Welcome, setup, appearance/credits, support screens, release verification and packaging | Merged PR #4; validation recorded below; pulled `d73936b` |
 
 The roadmap's later product opportunities (map editor, structured inventory,
 user-authored covers, audio, retro theme) remain separate scope. Portrait graph
@@ -39,3 +39,7 @@ The [0.19.0 release verification](reviews/gui-overhaul/04-release-verification.m
 records the independent test results, 116 final screenshots, Windows package
 identity and measured startup/theme performance tradeoffs. The complete package
 is available locally as `dist/StoryAtlas-Windows-x64.zip`.
+
+All four implementation stages are merged and pulled. Final integration merge:
+`d73936ba6913ecd7e8f669435fa48b46d301d6fc`. The post-pull source fingerprint matches
+the packaged 0.19.0 identity; local `main` remains `7f84251`.
