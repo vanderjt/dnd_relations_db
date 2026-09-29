@@ -23,7 +23,7 @@ class SimpleProfile(ttk.Frame):
         self.intro = tk.StringVar(self, next((label for label, ident in self.events.items() if ident == intro), 'Before first event'))
         bar = ActionBar(self)
         bar.pack(side='bottom', fill='x')
-        self.save_button = bar.add(ttk.Button(bar, text='Save character', width=0, command=self.save))
+        self.save_button = bar.add(ttk.Button(bar, text='Save character', style='Primary.TButton', width=0, command=self.save))
         bar.add(ttk.Button(bar, text='Close / Return', width=0, command=workspace.close_task))
         self.error = tk.StringVar(self)
         error_label = wrapping_label(self, textvariable=self.error, style='Validation.TLabel')

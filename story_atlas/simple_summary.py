@@ -3,6 +3,7 @@ from tkinter import ttk
 from .widgets import ActionBar, wrapping_label
 from .scroll_frame import ScrollFrame
 from .relationship_semantics import perspectives
+from .illustrated_widgets import IdentityHeader, IllustratedLabel
 
 
 class CharacterSummary(ttk.Frame):
@@ -19,12 +20,19 @@ class CharacterSummary(ttk.Frame):
         scroll = ScrollFrame(self)
         scroll.pack(fill='both', expand=True)
         body = scroll.content
-        wrapping_label(body, text=row['name'], style='Heading.TLabel').pack(fill='x')
-        wrapping_label(body, text=f"{row['character_type']} · current character type", style='Context.TLabel').pack(fill='x')
+        self.identity = IdentityHeader(body)
+        self.identity.pack(fill='x')
+        self.identity.name.configure(text=row['name'])
+        self.identity.details.configure(text=f"{row['character_type']} · current character type")
+        self.identity.show_portrait(workspace.database.assets, row.get('portrait', ''))
         wrapping_label(body, text='Profile and goals describe Current, including when viewing earlier events.', style='Muted.TLabel').pack(fill='x')
         for key in ('role', 'species', 'status', 'faction', 'location', 'tags', 'summary', 'goals'):
             if row.get(key):
-                wrapping_label(body, text=f"{key.title()}: {row[key]}").pack(fill='x', pady=4)
+                if key in ('summary', 'goals'):
+                    IllustratedLabel(body, 'section.story' if key == 'summary' else 'section.goals', text=key.title()).pack(fill='x', pady=(8, 2))
+                    wrapping_label(body, text=row[key]).pack(fill='x', pady=4)
+                else:
+                    wrapping_label(body, text=f"{key.title()}: {row[key]}").pack(fill='x', pady=4)
         ttk.Label(body, text='Connections at selected time', style='Heading.TLabel').pack(anchor='w', pady=8)
         records = [r for r in workspace.database.relationship_records() if row['id'] in (r['source_id'], r['target_id'])]
         if not records:

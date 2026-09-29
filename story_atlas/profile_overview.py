@@ -1,13 +1,13 @@
 """Readable committed profile and contextual relationship actions."""
 import tkinter as tk
 from tkinter import ttk
-from PIL import ImageTk
 from .scroll_frame import ScrollFrame
 from .widgets import wrapping_label, ActionBar
 from .relationship_semantics import profile_connections
 from .relationship_dialog import RelationshipDialog
 from .history_dialog import HistoryDialog
 from .relationship_display import LEGEND, relationship_details
+from .illustrated_widgets import IllustratedLabel, IdentityHeader
 
 
 class ProfileOverview(ttk.Frame):
@@ -19,16 +19,13 @@ class ProfileOverview(ttk.Frame):
         self.scroller.pack(fill="both", expand=True)
         body = self.scroller.content
         wrapping_label(body, text='Current — after the last event\nCurrent profile and goals · not historically versioned', style='Context.TLabel').pack(fill='x', pady=4)
-        self.name = wrapping_label(body, style="Heading.TLabel", font='AtlasHeading')
-        self.name.pack(fill="x", pady=(8, 4))
-        self.details = wrapping_label(body)
-        self.details.pack(fill="x", pady=6)
-        self.portrait = ttk.Label(body)
-        self.portrait.pack(anchor="w", pady=8)
-        ttk.Label(body, text="Summary", style="Heading.TLabel").pack(anchor="w", pady=6)
+        self.identity = IdentityHeader(body)
+        self.identity.pack(fill='x')
+        self.name, self.details, self.portrait = self.identity.name, self.identity.details, self.identity.portrait
+        IllustratedLabel(body, 'section.story', text="Summary").pack(fill='x', pady=6)
         self.summary = wrapping_label(body)
         self.summary.pack(fill="x", pady=6)
-        ttk.Label(body, text="Goals", style="Heading.TLabel").pack(anchor="w", pady=6)
+        IllustratedLabel(body, 'section.goals', text="Goals").pack(fill='x', pady=6)
         self.goals = wrapping_label(body)
         self.goals.pack(fill="x", pady=6)
         self.completion = wrapping_label(body, style="Muted.TLabel")
@@ -73,11 +70,7 @@ class ProfileOverview(ttk.Frame):
             ("character_type", "Character type"), ("role", "Role"), ("status", "Status"), ("faction", "Faction"), ("location", "Location"), ("tags", "Tags"))))
         self.summary.configure(text=row["summary"] or "No summary yet. Add a few sentences in Edit profile → Story.")
         self.goals.configure(text=row["goals"] or "What does this character want? Add immediate objectives, long-term ambitions, and obstacles in Edit goals.")
-        image = database.assets.thumbnail(row["portrait"])
-        if image:
-            self.photo = ImageTk.PhotoImage(image, master=self)
-        self.portrait.configure(image=self.photo or "", text="" if image else (
-            "Portrait unavailable — the rest of this profile is still accessible." if row["portrait"] else "No portrait"))
+        self.photo = self.identity.show_portrait(database.assets, row['portrait'])
         wrapping_label(self.connections, text=LEGEND, style='Muted.TLabel').pack(fill='x')
         groups = profile_connections(database.relationships(), character_id)
         for title, matches in groups.items():
