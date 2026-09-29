@@ -1,0 +1,6 @@
+# Windows x64; CPython 3.13.9. Regenerate the fully pinned lock after upgrades.
+PyInstaller==6.22.0
+Pillow==11.3.0
+matplotlib==3.10.0
+networkx==3.4.2
+numpy==2.1.3

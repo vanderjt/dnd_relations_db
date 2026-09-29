@@ -1,0 +1,9 @@
+name: story-atlas
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - tk
+  - pillow>=10,<13
+  - matplotlib>=3.9,<4
+  - networkx>=3.4,<4
