@@ -17,7 +17,7 @@ from .widgets import wrapping_label, ActionBar
 from .projects import Projects
 from .recovery import RecoveryDialog
 from .backup import snapshot
-from .guidance import GuidanceBar, show_help, show_about
+from .guidance import GuidanceBar, show_help, show_about, show_artwork_credits
 from .paths import resource
 from .navigation import NavigationController
 
@@ -40,34 +40,47 @@ class StoryAtlas(tk.Tk):
         self.backup_timer = None
         header = self.header = ActionBar(self)
         header.pack(fill="x", padx=16, pady=6)
-        self.story_title = ttk.Label(header, text="Story Atlas", style="Title.TLabel")
+        self.story_title = ttk.Label(header, text="Story Atlas", style="Heading.TLabel")
         header.add(self.story_title)
         self.story_menu = ttk.Menubutton(header, text="Story")
         story_actions = tk.Menu(self.story_menu, tearoff=False)
         for label, command in (("New story", lambda: self.projects.choose(True)),
                                ("Open story…", lambda: self.projects.choose()),
-                               ("Recent stories…", lambda: self.projects.recent()),
-                               ("Try expanded Greyhaven sample…", lambda: self.projects.try_sample()),
-                               ("Try the modern prometheus…", lambda: self.projects.try_sample('prometheus')),
-                               ("Export all data…", self.export_data)):
+                               ("Recent stories…", lambda: self.projects.recent())):
             story_actions.add_command(label=label, command=command)
+        samples = tk.Menu(story_actions, tearoff=False)
+        samples.add_command(label='Expanded Greyhaven…', command=lambda: self.projects.try_sample())
+        samples.add_command(label='The modern prometheus…', command=lambda: self.projects.try_sample('prometheus'))
+        story_actions.add_separator()
+        story_actions.add_cascade(label='Sample stories', menu=samples)
+        story_actions.add_command(label='Export all data…', command=self.export_data)
+        self.story_actions = story_actions
         self.story_menu.configure(menu=story_actions)
         header.add(self.story_menu)
-        header.add(ttk.Button(header, text="Search · Ctrl+K", command=lambda: self.projects.search()))
-        header.add(ttk.Button(header, text="Help · F1", command=lambda: show_help(self)))
-        header.add(ttk.Button(header, text="About", command=lambda: show_about(self)))
-        self.maintenance_menu = ttk.Menubutton(header, text="Maintenance")
+        self.search_button = header.add(ttk.Button(header, text="Search", command=lambda: self.projects.search()))
+        self.help_menu = header.add(ttk.Menubutton(header, text='Help'))
+        help_actions = tk.Menu(self.help_menu, tearoff=False)
+        help_actions.add_command(label='Help and shortcuts', accelerator='F1', command=lambda: show_help(self))
+        help_actions.add_separator()
+        help_actions.add_command(label='About Story Atlas', command=lambda: show_about(self))
+        help_actions.add_command(label='Artwork credits', command=lambda: show_artwork_credits(self))
+        self.help_menu.configure(menu=help_actions)
+        self.settings_menu = self.maintenance_menu = ttk.Menubutton(header, text="Settings")
         maintenance_actions = tk.Menu(self.maintenance_menu, tearoff=False)
-        maintenance_actions.add_command(label="Recovery, Trash, and drafts…", command=self.open_recovery)
         maintenance_actions.add_command(label="Appearance…", command=lambda: AppearanceDialog(self))
+        maintenance_actions.add_separator()
+        maintenance_actions.add_command(label="Recovery, Trash, and drafts…", command=self.open_recovery)
         maintenance_actions.add_command(label="Activity log (Advanced)", command=self.open_activity)
         self.maintenance_menu.configure(menu=maintenance_actions)
         header.add(self.maintenance_menu)
         self.mode = tk.StringVar(self, self.settings.values['mode'])
-        mode_box = ttk.Combobox(header, textvariable=self.mode, values=('Simple', 'Advanced'), state='readonly', width=11)
-        self.mode_label = header.add(ttk.Label(header, text='Mode'))
+        self.mode_group = ttk.Frame(header)
+        self.mode_label = ttk.Label(self.mode_group, text='Mode')
+        self.mode_label.pack(side='left', padx=(0, 6))
+        mode_box = ttk.Combobox(self.mode_group, textvariable=self.mode, values=('Simple', 'Advanced'), state='readonly', width=9)
         self.mode_box = mode_box
-        header.add(mode_box)
+        mode_box.pack(side='left')
+        header.add(self.mode_group)
         mode_box.bind('<<ComboboxSelected>>', self.switch_mode)
         self.guidance = GuidanceBar(self)
         self.guidance.pack(fill="x")
@@ -76,10 +89,6 @@ class StoryAtlas(tk.Tk):
         self.navigation = NavigationController(self)
         self.back_button = header.add(ttk.Button(header, text="Back", command=self.navigation.back, state="disabled"))
         self.header_items = list(header.items)
-        story_actions.add_separator()
-        story_actions.add_command(label='Search · Ctrl+K', command=lambda: self.projects.search())
-        story_actions.add_command(label='Help · F1', command=lambda: show_help(self))
-        story_actions.add_command(label='About', command=lambda: show_about(self))
         self.characters = CharactersView(self.tabs, self.database, self.refresh, self.navigation)
         self.relationships = RelationshipsView(self.tabs, self.database, self.refresh)
         self.graph = GraphView(self.tabs, self.database, self.refresh, self.open_character)
@@ -88,6 +97,8 @@ class StoryAtlas(tk.Tk):
         self.views = (self.characters, self.events, self.relationships, self.graph, self.activity)
         for view, label in zip(self.views, ("Characters", "Chapters & events", "Relationships", "Graph", "Activity log")):
             self.tabs.add(view, text=label)
+        self.tabs.atlas_refresh_art = self.refresh_tab_art
+        self.refresh_tab_art()
         self.tabs.hide(self.activity)
         self.tabs.bind("<<NotebookTabChanged>>", self.tab_changed)
         self.status = tk.StringVar(value=f"Ready  ·  Local database: {self.database.path}")
@@ -112,7 +123,7 @@ class StoryAtlas(tk.Tk):
         self.automatic_backup()
         draft_count = len(self.database.drafts.list())
         if draft_count:
-            self.status.set(f"{draft_count} recoverable task draft(s). Open Maintenance → Recovery to review them.")
+            self.status.set(f"{draft_count} recoverable task draft(s). Open Settings → Recovery to review them.")
 
     def switch_mode(self, _event=None):
         if not self.characters.can_leave(reset_discard=True) or not self.simple.close_task():
@@ -128,10 +139,18 @@ class StoryAtlas(tk.Tk):
         self.apply_mode()
         return True
 
+    def refresh_tab_art(self):
+        from .ui_assets import cache_for
+        self.tabs.atlas_images = []
+        for view, key in ((self.characters, 'section.identity'), (self.events, 'section.chapter')):
+            image = cache_for(self).get(key, 16, self.settings.values['theme']) if self.settings.values.get('illustrations', 'Illustrated') == 'Illustrated' else None
+            self.tabs.atlas_images.append(image)
+            self.tabs.tab(view, image=image or '', compound='left')
+
     def apply_mode(self):
         for widget in self.header_items:
             widget.grid_forget()
-        self.header.items = [self.story_menu, self.maintenance_menu, self.mode_label, self.mode_box] if self.mode.get() == 'Simple' else list(self.header_items)
+        self.header.items = [widget for widget in self.header_items if widget is not self.back_button or self.mode.get() == 'Advanced']
         self.projects.update_title()
         self.header.reflow()
         if self.mode.get() == 'Simple':
@@ -176,7 +195,7 @@ class StoryAtlas(tk.Tk):
         try:
             snapshot(self.database.connection, self.database.path, "auto", self.settings.values["backup_retention"])
         except (OSError, sqlite3.Error, ValueError) as error:
-            self.status.set(f"Automatic backup failed: {error}. Use Maintenance → Recovery to retry.")
+            self.status.set(f"Automatic backup failed: {error}. Use Settings → Recovery to retry.")
         self.backup_timer = self.after(15 * 60 * 1000, self.automatic_backup)
 
     def switch_database(self, path):

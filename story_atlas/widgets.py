@@ -98,20 +98,56 @@ class ActionBar(ttk.Frame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
         self.items = []
+        self._rows = []
+        self._reflow_pending = None
+        self.atlas_refresh_art = self.reflow
         self.bind("<Configure>", self.reflow)
 
     def add(self, widget):
         self.items.append(widget)
+        widget.bind('<Configure>', self.schedule_reflow, add='+')
         self.reflow()
         return widget
 
+    def schedule_reflow(self, _event=None):
+        if self._reflow_pending is None:
+            self._reflow_pending = self.after_idle(self._scheduled_reflow)
+
+    def _scheduled_reflow(self):
+        self._reflow_pending = None
+        self.reflow()
+
+    def destroy(self):
+        if self._reflow_pending is not None:
+            self.after_cancel(self._reflow_pending)
+            self._reflow_pending = None
+        super().destroy()
+
     def reflow(self, _event=None):
         width = max(1, self.winfo_width())
-        row, column, used = 0, 0, 0
+        row, column, used, y, row_height = 0, 0, 0, 0, 0
+        self._rows = [frame for frame in self._rows if frame.winfo_exists()]
+        self.items = [widget for widget in self.items if widget.winfo_exists()]
         for widget in self.items:
             needed = widget.winfo_reqwidth() + SPACE["small"]
             if used and used + needed > width:
+                self._rows[row].place(x=0, y=y, width=width, height=row_height)
+                y += row_height
+                row_height = 0
                 row, column, used = row + 1, 0, 0
-            widget.grid(row=row, column=column, sticky="w", padx=(0, SPACE["small"]), pady=3)
+            if row == len(self._rows):
+                self._rows.append(ttk.Frame(self))
+            frame = self._rows[row]
+            # Separate geometry containers prevent one wide control on another
+            # row from silently widening every row's corresponding column.
+            widget.grid(in_=frame, row=0, column=column, sticky="w", padx=(0, SPACE["small"]), pady=3)
             column += 1
             used += needed
+            row_height = max(row_height, widget.winfo_reqheight() + 6)
+        if self.items:
+            self._rows[row].place(x=0, y=y, width=width, height=row_height)
+            y += row_height
+        for frame in self._rows[row + 1 if self.items else 0:]:
+            frame.place_forget()
+        if int(self.cget('height')) != max(1, y):
+            self.configure(height=max(1, y))

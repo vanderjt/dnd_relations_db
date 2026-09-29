@@ -87,6 +87,9 @@ def refresh_widget(widget):
 
 def refresh_illustrations(root):
     """Refresh existing controls only: never rebuild forms or mutate their values."""
+    callback = getattr(root, 'atlas_refresh_art', None)
+    if callback:
+        callback()
     if hasattr(root, 'atlas_art'):
         refresh_widget(root)
     for child in root.winfo_children():

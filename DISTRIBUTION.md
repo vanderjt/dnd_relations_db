@@ -6,7 +6,7 @@
 
 > 0.15.0 adds Ctrl+Z undo and Ctrl+Y redo. Text fields undo local typing; the workspace undoes saved story changes and node positioning. History is local to the current open-story session.
 
-> 0.14.2 adds Delete beside Connect in the character info panel. It moves the character and attached connections to Trash; restore them from Maintenance → Recovery.
+> 0.14.2 adds Delete beside Connect in the character info panel. It moves the character and attached connections to Trash; restore them from Settings → Recovery.
 
 > 0.14.1 simplifies graph labels: no numeric IDs beside names or relationships, and no redundant Dot/Link prefixes in the plotted legend.
 

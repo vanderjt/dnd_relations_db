@@ -96,7 +96,8 @@ def apply_theme(root, mode="dark", text_size=10):
     if style.theme_use() != "clam":
         style.theme_use("clam")
     style.configure(".", background=colors["bg"], foreground=colors["text"],
-                    bordercolor=colors["border"], font="AtlasBody", focuscolor=colors["accent"])
+                    bordercolor=colors["border"], lightcolor=colors["border"], darkcolor=colors["border"],
+                    font="AtlasBody", focuscolor=colors["focus"])
     style.configure("TLabel", background=colors["bg"], foreground=colors["text"])
     style.configure("Content.TFrame", background=colors["panel"])
     style.configure("Detail.TFrame", background=colors["detail"], relief="solid", borderwidth=1)
@@ -127,6 +128,9 @@ def apply_theme(root, mode="dark", text_size=10):
                   bordercolor=[("focus", colors["focus"])])
     # Menubuttons use their own ttk element, so expose the secondary treatment
     # separately for compact, less-frequent action menus.
+    style.configure("TMenubutton", background=colors["panel"], foreground=colors["text"],
+                    padding=(10, 7), borderwidth=1)
+    style.map('TMenubutton', background=[('active', colors['hover'])], bordercolor=[('focus', colors['focus'])])
     style.configure("Secondary.TMenubutton", background=colors["panel"], foreground=colors["text"],
                     padding=(10, 7), borderwidth=1)
     style.map("Secondary.TMenubutton", background=[("disabled", colors["bg"]), ("pressed", colors["selected"]),

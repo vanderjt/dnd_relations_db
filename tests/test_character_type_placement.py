@@ -99,8 +99,10 @@ class UITests(unittest.TestCase):
         labels = [menu.entrycget(i, 'label') for i in range(menu.index('end') + 1) if menu.type(i) != 'separator']
         for duplicate in ('New event', 'Next event', 'Character selection controls', 'Character type · current'):
             self.assertNotIn(duplicate, labels)
-        for unique in ('Fit view', 'Export displayed graph…', 'Saved graph views…'):
+        for unique in ('Export displayed graph…', 'Saved graph views…'):
             self.assertIn(unique, labels)
+        view_labels = [self.ws.view_menu.entrycget(i, 'label') for i in range(self.ws.view_menu.index('end') + 1) if self.ws.view_menu.type(i) != 'separator']
+        self.assertIn('Fit view', view_labels)
         self.app.geometry('900x600')
         self.app.update()
         for text in ('New event', 'Next event'):

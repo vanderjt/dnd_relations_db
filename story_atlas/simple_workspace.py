@@ -34,20 +34,22 @@ class SimpleWorkspace(ttk.Frame):
         ribbon.add(ttk.Button(ribbon, text='New event', command=self.new_event))
         ribbon.add(ttk.Button(ribbon, text='Next event', command=self.continue_event))
         self.graph = SimpleGraph(self, self)
+        self.view_button = ribbon.add(ttk.Menubutton(ribbon, text='View'))
+        self.view_menu = view_menu = tk.Menu(self.view_button, tearoff=False)
+        self.view_button.configure(menu=view_menu)
         menu_button = ttk.Menubutton(ribbon, text='More')
-        menu = tk.Menu(menu_button, tearoff=False)
+        self.more_menu = menu = tk.Menu(menu_button, tearoff=False)
         menu.add_command(label='New chapter', command=lambda: self.new_event(True))
-        menu.add_command(label='Fit view', command=self.graph.fit_graph)
-        menu.add_checkbutton(label='Show planned cast', variable=self.graph.show_planned, command=lambda: self.graph.refresh(force=True))
-        menu.add_cascade(label='Graph filters', menu=self.graph.filter_menu)
-        menu.add_command(label='Undo recent character creation', command=self.undo_creation)
+        view_menu.add_command(label='Fit view', command=self.graph.fit_graph)
+        view_menu.add_checkbutton(label='Show planned cast', variable=self.graph.show_planned, command=lambda: self.graph.refresh(force=True))
+        view_menu.add_cascade(label='Graph filters', menu=self.graph.filter_menu)
         menu.add_command(label='Edit selected event', command=self.edit_event)
-        menu.add_command(label='Collapse / show information pane', command=self.toggle_pane)
-        menu.add_command(label='Zoom rectangle', command=lambda: self.graph.controls.toggle('zoom'))
-        menu.add_command(label='Pan tool', command=lambda: self.graph.controls.toggle('pan'))
-        menu.add_command(label='Export displayed graph…', command=self.graph.export)
-        menu.add_command(label='Saved graph views…', command=self.graph.saved_views)
         menu.add_command(label='Remove event and reassign references…', command=self.remove_event)
+        menu.add_separator()
+        menu.add_command(label='Saved graph views…', command=self.graph.saved_views)
+        menu.add_command(label='Export displayed graph…', command=self.graph.export)
+        menu.add_separator()
+        menu.add_command(label='Undo recent character creation', command=self.undo_creation)
         menu_button.configure(menu=menu)
         ribbon.add(menu_button)
         from .character_type import TYPE_COLORS as COLORS
@@ -64,7 +66,11 @@ class SimpleWorkspace(ttk.Frame):
         from .graph_legend import add_menu_explanations
         add_menu_explanations(legend_menu)
         legend.configure(menu=legend_menu)
-        ribbon.add(legend)
+        view_menu.add_cascade(label='Legend · dots & links', menu=legend_menu)
+        view_menu.add_separator()
+        view_menu.add_command(label='Collapse / show information pane', command=self.toggle_pane)
+        view_menu.add_command(label='Zoom rectangle', command=lambda: self.graph.controls.toggle('zoom'))
+        view_menu.add_command(label='Pan tool', command=lambda: self.graph.controls.toggle('pan'))
         self.ribbon_full = ribbon.items.copy()
         self.ribbon_compact = self.ribbon_full
         self.compact = None
@@ -311,7 +317,7 @@ class SimpleWorkspace(ttk.Frame):
         connections = sum(ident in (r['source_id'], r['target_id']) for r in self.database.relationship_records())
         if not messagebox.askyesno('Move character to Trash',
                 f"Move {row['name']} and all {connections} attached connections to Trash? "
-                'They will disappear from the graph and can be restored from Maintenance → Recovery.', parent=self):
+                'They will disappear from the graph and can be restored from Settings → Recovery.', parent=self):
             return False
         try:
             self.database.delete_character(ident)
@@ -323,7 +329,7 @@ class SimpleWorkspace(ttk.Frame):
         self.cast.set('')
         self.connection_choice.set('')
         self.recent_creation = None
-        self.app.refresh(f"{row['name']} and {connections} connections moved to Trash. Restore them from Maintenance → Recovery.")
+        self.app.refresh(f"{row['name']} and {connections} connections moved to Trash. Restore them from Settings → Recovery.")
         return True
 
     def connect(self, ident):

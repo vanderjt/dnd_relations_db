@@ -33,7 +33,7 @@ Sample creation never inserts into or overwrites an existing story.
 
 Later launches reopen the last available story. Use `python main.py --welcome`
 to return to startup choices. Canceling a file picker creates nothing; a missing
-last story returns to the welcome screen. **Help · F1** explains saving,
+last story returns to the welcome screen. **Help → Help and shortcuts (F1)** explains saving,
 relationship direction, graph navigation, and recovery. Contextual tips can be
 dismissed individually and restored from Help.
 
@@ -129,7 +129,7 @@ Chronology conflicts require an explicit later event or introduction reassignmen
 Close, navigation and mode switches offer **Save / Discard / Stay** for unfinished
 Simple tasks. Unchanged inspection needs no prompt. Character, Simple event,
 relationship batch and relationship-state drafts are stored separately from saved
-records in the story database. **Maintenance → Recovery, Trash, and drafts** lets
+records in the story database. **Settings → Recovery, Trash, and drafts** lets
 you review them after restart. New event/batch tasks also resume their existing
 draft. Recovery retains stable IDs and revalidates references; missing targets or
 participants require explicit exclusion or restoration. Missing exact correction
@@ -155,10 +155,10 @@ for the prior rework. The [combined legend and worked examples report](docs/revi
 
 The main tabs follow **Characters → Events → Relationships → Graph**. Contextual
 Next actions link the steps, but none is mandatory: undated relationships remain
-supported. **Maintenance → Activity log** opens technical activity separately.
+supported. **Settings → Activity log** opens technical activity separately.
 
 1. Use the **Story** menu for New, Open, Recent, and Export actions. **Search · Ctrl+K**
-   and **Help · F1** remain directly available. **Maintenance** contains Recovery,
+   and **Help → Help and shortcuts (F1)** remain directly available. **Settings** contains Recovery,
    Trash, drafts, and appearance settings; the separate **Activity log** is the
    technical audit trail, while **Events** is the fictional chronology.
 2. On **Characters**, choose **New character**, enter a name and profile, and save.
@@ -1023,7 +1023,7 @@ New graph workspaces default to the Circle (round) layout. Explicit saved views 
 
 Story and the welcome screen offer updated Greyhaven and **the modern prometheus**. Each creates a separate database. The latter models the 1831 Frankenstein with 17 characters, 20 events, six editorial chapters and 33 connections. Both open with a round overview, five character types, and explicit link colors. Use More → Saved graph views for guided scenes. See [the example walkthrough](examples/START%20HERE.md) for steps, source attribution, and modeling choices. A saved view named Example overview supplies the initial positions, layout, label visibility and link categories when a story opens; other saved views load only when selected.
 
-Click a character to inspect it, then use **Delete** beside **Connect…** at the bottom of the info panel. After confirmation, the character and every attached connection (including ended connections) move to Trash and disappear from the graph. Restore the character from **Maintenance → Recovery** to recover those connections and their history.
+Click a character to inspect it, then use **Delete** beside **Connect…** at the bottom of the info panel. After confirmation, the character and every attached connection (including ended connections) move to Trash and disappear from the graph. Restore the character from **Settings → Recovery** to recover those connections and their history.
 
 ## Undo and redo
 
