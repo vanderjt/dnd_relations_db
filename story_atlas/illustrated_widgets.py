@@ -19,7 +19,7 @@ class IdentityHeader(ttk.Frame):
         super().__init__(parent, padding=(0, 8))
         self.name = wrapping_label(self, style='Heading.TLabel', font='AtlasHeading')
         self.name.pack(fill='x', pady=(0, 4))
-        self.details = wrapping_label(self, style='Context.TLabel')
+        self.details = wrapping_label(self, style='Muted.TLabel')
         self.details.pack(fill='x', pady=4)
         self.portrait = ttk.Label(self)
         self.portrait.pack(anchor='w', pady=6)

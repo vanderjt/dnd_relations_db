@@ -39,13 +39,16 @@ class UIAssetCache:
             if not path.is_relative_to(self.folder.resolve()):
                 raise ValueError('Asset path outside catalog')
             with Image.open(path) as original:
+                if original.width > 2048 or original.height > 2048:
+                    raise ValueError('Decorative asset exceeds supported dimensions')
                 image = original.convert('RGBA')
                 ratio = min(size / image.width, size / image.height)
                 image = image.resize((max(1, round(image.width * ratio)), max(1, round(image.height * ratio))), Image.Resampling.NEAREST)
                 canvas = Image.new('RGBA', (size, size))
                 canvas.alpha_composite(image, ((size - image.width) // 2, (size - image.height) // 2))
                 photo = ImageTk.PhotoImage(canvas, master=self.root)
-        except (OSError, ValueError, KeyError, TypeError, tk.TclError):
+        except (OSError, ValueError, KeyError, TypeError, tk.TclError,
+                Image.DecompressionBombError, Image.DecompressionBombWarning):
             pass  # Text remains usable even if optional resources are damaged.
         self.images[cache_key] = photo
         while len(self.images) > self.capacity:

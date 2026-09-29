@@ -110,6 +110,8 @@ def capture(output, theme, mode, size, text_size, scaling=None, state='overview'
                 app.characters.open_character(ident)
                 if state == 'editor':
                     app.characters.edit_profile()
+            # A foreground editor can otherwise occlude screenshots on Windows.
+            app.attributes('-topmost', True)
             app.lift()
             settle(app)
             x, y = app.winfo_rootx(), app.winfo_rooty()
