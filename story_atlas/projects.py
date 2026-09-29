@@ -17,6 +17,7 @@ class Projects:
         self.app = app
         self.sessions = {}
         self.search_states = {}
+        app.header.bind('<Configure>', self.update_header_title, add='+')
         self.update_title()
         self.remember(app.database.path)
 
@@ -27,8 +28,22 @@ class Projects:
         title = self.app.database.connection.execute("SELECT value FROM story_metadata WHERE key='title'").fetchone()
         name = title[0] if title else self.app.database.path.stem
         self.app.title(f"Story Atlas · {name}")
-        self.app.story_title.configure(text=name[:24] if self.app.mode.get() == "Simple" else f"Story Atlas · {name[:30]}{'…' if len(name) > 30 else ''}")
+        self.app.story_title.full_title = name
+        self.update_header_title()
         self.app.story_title.master.reflow()
+
+    def update_header_title(self, _event=None):
+        from tkinter import font
+        label = self.app.story_title
+        title = getattr(label, 'full_title', 'Story Atlas')
+        budget = max(120, min(360, int(self.app.winfo_width() * .27)))
+        heading = font.nametofont('AtlasHeading', root=self.app)
+        text = title
+        while text and heading.measure(text + ('…' if text != title else '')) > budget:
+            text = text[:-1]
+        text += '…' if text != title else ''
+        if label.cget('text') != text:
+            label.configure(text=text)
 
     def remember(self, path):
         path = self.key(path)
