@@ -195,6 +195,10 @@ class WorkspaceArtTests(unittest.TestCase):
         renderer.highlight(('node', 3))
         self.assertTrue(renderer.node_labels[4].get_visible())
         self.assertTrue(renderer.node_labels[5].get_visible())
+        # Provisional cleanup removes model positions before the queued redraw.
+        renderer.positions.pop(4)
+        renderer.highlight(('node', 3))
+        self.assertTrue(renderer.node_labels[4].get_visible())
 
     def test_sparse_long_names_remain_separate_inside_narrow_canvas(self):
         from matplotlib.figure import Figure

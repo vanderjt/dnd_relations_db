@@ -190,7 +190,9 @@ class GraphRenderer:
             self.node_labels[node].set_text(name +
                                               (f"\n{state_text}" if states else ""))
             label = self.node_labels[node]
-            x, y = self.axes.transData.transform(self.positions[node])
+            # A provisional node's model position can be removed before the
+            # pending redraw clears its artist. The artist still has an anchor.
+            x, y = self.axes.transData.transform(label.xy)
             sparse = len(self.nodes) <= self.label_budget
             right = narrow and not sparse and x > self.axes.bbox.x0 + self.axes.bbox.width * .7
             left = narrow and not sparse and x < self.axes.bbox.x0 + self.axes.bbox.width * .3

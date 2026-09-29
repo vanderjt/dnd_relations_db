@@ -31,4 +31,6 @@ Latest focused repeat: **21 tests passed in 17.848s**, no skips. Added tests com
 
 Final review refinements preserve visible checked Zoom/Pan menu state in compact mode, prove full long names are present during enlarged export, and keep sparse graph labels centered with boundary clamping only when their actual rendered boxes exceed the canvas. The two-node long-name test verifies boxes do not overlap and remain inside the canvas. Latest focused run: **23 tests passed in 20.695s**, no skips. Frozen source fingerprint: `447711b9629de7fac5577b2e1e2724f985c9744bd346948d06c61524865d73f0`.
 
+The full regression run found a transient provisional-node cleanup failure: its model position can disappear before the queued redraw removes its annotation. Alignment now uses the annotation's existing data anchor (`label.xy`), which is also updated during ordinary dragging. The reviewer independently confirmed this preserves steady-state geometry. Added an explicit missing-position regression. **47 focused Simple mode/rework/undo/workspace tests passed in 39.154s** after the fix; the full suite is rerunning as the final integration gate.
+
 Full regression, capture review and repeated performance comparison remain integration gates. Physical Windows per-monitor DPI remains an external validation limitation.
