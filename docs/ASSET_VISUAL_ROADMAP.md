@@ -2,7 +2,7 @@
 
 Prepared 28 September 2026 for Story Atlas 0.18.0.
 
-Status: proposed implementation roadmap. No application behavior or artwork has been changed. Grounded in the current Python/Tkinter source, the existing visual design/review documents, and the local asset inventory. This is a source review and asset inspection, not a fresh visual audit of the running application.
+Status updated 29 September 2026: phases 0–3 implemented and independently reviewed on `gui_overhaul`; supporting screens and release verification are being completed for 0.19.0. The sections below preserve the original design proposal and baseline observations. Current evidence and unresolved limitations are recorded in `docs/reviews/gui-overhaul/`. Portrait graph nodes and the other P2/data-model features remain future scope; physical mixed-monitor DPI and representative-user studies are not established by local screenshot tests.
 
 ## 1. The direction: an illustrated story atlas
 

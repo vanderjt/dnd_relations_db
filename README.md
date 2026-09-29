@@ -1,5 +1,10 @@
 # Story Atlas
 
+Version **0.19.0** introduces an illustrated visual language, compact menus and
+responsive workspaces. Choose **Settings → Appearance → Artwork** for Illustrated
+or Minimal; both preserve imported portraits. **Help → Artwork credits** includes
+the selected HAS artwork's attribution and license texts. Database schema remains 13.
+
 A local storytelling notebook built with Python, Anaconda, Tkinter, SQLite,
 NetworkX, and Matplotlib. No account or server required.
 
@@ -17,17 +22,18 @@ If your existing Anaconda environment already has Tkinter, Matplotlib, and
 NetworkX, you can run `python main.py` directly. The tested local runtime is
 Anaconda Python 3.13.9. Create the dedicated environment above to isolate dependencies.
 
-You can also double-click **Launch Story Atlas.cmd**. It opens the packaged
-build when present, otherwise your `story-atlas` Conda environment. For a build
+You can also double-click **Launch Story Atlas.cmd**. It opens the current packaged
+build in `dist/StoryAtlas`; if missing, it asks you to build it first. Use
+**Launch Story Atlas Source.cmd** for the source checkout. For a build
 that needs no Anaconda, see [Windows distribution](DISTRIBUTION.md).
 
-On first launch choose **Start empty**, **Open story**, or **Try sample story**.
-Each sample is a fresh Greyhaven database containing **18 characters, 50 stored
+On first launch choose **Start empty**, **Open story**, **Try Greyhaven**, or
+**Try the modern prometheus**. Greyhaven creates a fresh database containing **18 characters, 50 stored
 connections, and ten events across three chapters**. The original five characters now share a cast
 of dockworkers, witnesses, healers, smugglers, and council officials. Explore
 family, employment, mentorship, debts, patronage, blackmail, and other connections.
 Some links begin at events, change, end, or resume; 49 connections remain active
-at Current. From an open story choose **Story → Try expanded Greyhaven sample…**
+at Current. From an open story choose **Story → Sample stories → Expanded Greyhaven…**
 to create a separate sample after the normal unsaved-edit checks.
 Sample creation never inserts into or overwrites an existing story.
 
@@ -143,13 +149,13 @@ Trash restoration remains available. There is no general history undo engine.
 Drag empty background to pan, wheel to zoom and nodes to pin them. Arrow keys move
 the selected node with graph keyboard focus. The bottom timeline navigates without
 changing chronology. Positions and zoom survive navigation and mode changes.
-More exposes graph filters, exports, saved views, event editing and explicit
+View exposes graph filters; More exposes exports, saved views, event editing and explicit
 reference reassignment. NetworkX and Matplotlib remain the graph implementation.
 
-This release is **0.18.0**, database schema **13**, portable story format **9**.
+This release is **0.19.0**, database schema **13**, portable story format **9**.
 Older formats 1–7 remain readable. Migration backs up existing databases before
 making transactional changes. See the [Simple rework completion report](docs/reviews/2026-09-24/SIMPLE_REWORK_COMPLETION_REPORT.md)
-for the prior rework. The [combined legend and worked examples report](docs/reviews/2026-09-24/EXAMPLES_REPORT.md) records this release.
+for the prior rework. The [GUI overhaul review records](docs/reviews/gui-overhaul/) document this release's staged implementation, visual checks and remaining verification limits. The [combined legend and worked examples report](docs/reviews/2026-09-24/EXAMPLES_REPORT.md) is historical.
 
 ## Advanced workflow
 

@@ -5,10 +5,6 @@ if exist "%~dp0StoryAtlas.exe" (
   "%~dp0StoryAtlas.exe" %*
   exit /b %errorlevel%
 )
-if exist "%~dp0dist\releases\0.17.0\StoryAtlas\StoryAtlas.exe" (
-  "%~dp0dist\releases\0.17.0\StoryAtlas\StoryAtlas.exe" %*
-  exit /b %errorlevel%
-)
 if exist "%~dp0dist\StoryAtlas\StoryAtlas.exe" (
   "%~dp0dist\StoryAtlas\StoryAtlas.exe" %*
   exit /b %errorlevel%

@@ -20,8 +20,8 @@ and focus interference. All test stories/settings are disposable.
 |---|---|---|
 | `gui-overhaul/01-foundation` | Curated assets, provenance, image cache, shared components, character pilot, validation capture tool | Merged PR #1; 233 tests passed; pulled `aacf783` |
 | `gui-overhaul/02-navigation` | Header, menus, Simple toolbar, Advanced navigation, help references | Merged PR #2; 237 tests passed; pulled `6ddb63c` |
-| `gui-overhaul/03-workspaces` | Roster/search, relationship details, chronology, graph inspector | In progress |
-| `gui-overhaul/04-support-release` | Welcome, setup, appearance/credits, support screens, release verification and packaging | Pending |
+| `gui-overhaul/03-workspaces` | Roster/search, relationship details, chronology, graph inspector | Merged PR #3; 248 tests passed; pulled `add06e8` |
+| `gui-overhaul/04-support-release` | Welcome, setup, appearance/credits, support screens, release verification and packaging | Validated; awaiting reviewed PR integration |
 
 The roadmap's later product opportunities (map editor, structured inventory,
 user-authored covers, audio, retro theme) remain separate scope. Portrait graph
@@ -34,3 +34,8 @@ Generated test logs, screenshot matrices, and build output belong in the ignored
 `build-verification` and `dist` directories. Reports distinguish source, packaged,
 simulated scaling, and actual hardware checks; unperformed physical DPI/user
 studies are not represented as passing.
+
+The [0.19.0 release verification](reviews/gui-overhaul/04-release-verification.md)
+records the independent test results, 116 final screenshots, Windows package
+identity and measured startup/theme performance tradeoffs. The complete package
+is available locally as `dist/StoryAtlas-Windows-x64.zip`.

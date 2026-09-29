@@ -225,6 +225,84 @@ def capture(output, theme, mode, size, text_size, scaling=None, state='overview'
                 app.destroy()
 
 
+def capture_support(output, theme, state, size, text_size, illustrations, scaling=None):
+    from story_atlas.settings import Settings
+    from story_atlas.onboarding import Welcome
+    from story_atlas.appearance import AppearanceDialog
+    from story_atlas.guidance import show_artwork_credits
+    from story_atlas.recovery import RecoveryDialog
+    from story_atlas.story_setup import StorySetup
+    before = source_fingerprint()
+    name = f'support-{state}-{theme}-{size}-{text_size}pt'
+    with tempfile.TemporaryDirectory(prefix='support-', dir=output) as temporary:
+        folder = Path(temporary)
+        settings = Settings(folder / 'settings.json')
+        mode = 'Simple' if state == 'empty-simple' else 'Advanced'
+        settings.save(theme=theme, text_size=text_size, illustrations=illustrations, mode=mode)
+        app = Welcome(folder, settings) if state == 'welcome' else StoryAtlas(folder / 'empty.db', settings_path=settings.path)
+        errors = []
+        app.report_callback_exception = lambda kind, value, trace: errors.append(f'{kind.__name__}: {value}')
+        window = app
+        try:
+            if scaling is not None:
+                from story_atlas.theme import apply_theme
+                app.tk.call('tk', 'scaling', scaling)
+                if state == 'welcome':
+                    apply_theme(app, theme, text_size)
+                else:
+                    app.set_appearance(theme, text_size)
+            if state == 'setup':
+                window = StorySetup(app, folder / 'stories', lambda _: None)
+                window.fields[0].set('A new illustrated chronicle')
+                window.customize_button.invoke()
+            elif state == 'appearance':
+                window = AppearanceDialog(app)
+            elif state == 'credits':
+                window = show_artwork_credits(app)
+            elif state.startswith('recovery-'):
+                ident = app.database.save_character({'name': 'Recoverable witness'})
+                app.database.trash.delete_character(ident)
+                app.database.drafts.save(None, {'name': 'Uncommitted review draft'})
+                window = RecoveryDialog(app)
+                tab = {'recovery-backups': 'Backups & import', 'recovery-trash': 'Trash', 'recovery-drafts': 'Drafts'}[state]
+                window.tabs.select(window.pages[tab])
+                tree = {'recovery-backups': window.backups, 'recovery-trash': window.trash, 'recovery-drafts': window.drafts}[state]
+                if tree.get_children():
+                    tree.selection_set(tree.get_children()[0])
+                    window.update_actions()
+            window.geometry(size + '+20+20')
+            window.attributes('-topmost', True)
+            window.lift()
+            settle(app)
+            x, y, w, h = window.winfo_rootx(), window.winfo_rooty(), window.winfo_width(), window.winfo_height()
+            if sys.platform == 'win32':
+                captured = ImageGrab.grab(window=window.winfo_id())
+                method = 'Pillow Windows window capture (owned window HWND)'
+            else:
+                captured = ImageGrab.grab(bbox=(x, y, x+w, y+h), all_screens=True)
+                method = 'Desktop bounding box; manual occlusion inspection required'
+            captured.save(output / (name + '.png'))
+            return dict(name=name, state=state, theme=theme, mode=mode, text_size=text_size,
+                        actual_illustrations=app.settings.values['illustrations'],
+                        requested_size=size, actual_client_size=[w,h], captured_pixels=list(captured.size),
+                        capture_method=method, screenshot=name+'.png', callback_errors=errors,
+                        source_fingerprint_before=before, source_fingerprint_after=source_fingerprint(),
+                        geometry_candidates=geometry_candidates(window),
+                        tk_scaling=float(app.tk.call('tk', 'scaling')),
+                        simulated_tk_scaling=scaling,
+                        fixture='Disposable empty story; recovery cases contain one trash item and one uncommitted draft; setup opening expanded')
+        finally:
+            if window is not app and window.winfo_exists():
+                window.destroy()
+            if getattr(app, 'backup_timer', None):
+                app.after_cancel(app.backup_timer)
+            try:
+                if hasattr(app, 'database'):
+                    app.database.close()
+            finally:
+                app.destroy()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', default='baseline')
@@ -233,9 +311,14 @@ def main():
     parser.add_argument('--illustrations', choices=('Illustrated', 'Minimal'), default='Illustrated')
     parser.add_argument('--release', action='store_true', help='Add disposable Greyhaven core-screen, historical, fallback, and validation cases')
     parser.add_argument('--minimum-only', action='store_true', help='Capture only 760x480/16pt cases (four baseline, plus six with --release)')
+    parser.add_argument('--support', action='store_true', help='Add supporting-screen and true-empty captures')
+    parser.add_argument('--support-only', action='store_true', help='Run only supporting-screen captures')
+    parser.add_argument('--text-size', type=int, choices=range(9,17), help='Override text size for every captured case')
     args = parser.parse_args()
     if args.minimum_only and args.pilot:
         parser.error('--minimum-only cannot be combined with --pilot')
+    if args.support_only and (args.release or args.pilot):
+        parser.error('--support-only cannot be combined with --release or --pilot')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('label must contain only letters, digits, underscores, or hyphens')
     output = ROOT / 'build-verification' / 'gui-overhaul' / f'{args.label}-{time.strftime("%Y%m%d-%H%M%S")}'
@@ -244,15 +327,15 @@ def main():
                   python=sys.version, platform=platform.platform(),
                   dpi_scope='Current desktop only. Physical Windows scaling and per-monitor changes not tested.',
                   fixture='Two fictional characters, one connection, one event; optional synthetic portrait.', cases=[])
-    for mode in ('Simple', 'Advanced'):
+    for mode in (() if args.support_only else ('Simple', 'Advanced')):
         for theme in ('dark', 'light'):
             dimensions = (('760x480', 16),) if args.minimum_only else (('1180x720', 10), ('760x480', 16))
             for size, text_size in dimensions:
-                report['cases'].append(capture(output, theme, mode, size, text_size, args.tk_scaling, illustrations=args.illustrations))
+                report['cases'].append(capture(output, theme, mode, size, args.text_size or text_size, args.tk_scaling, illustrations=args.illustrations))
                 (output / 'report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
             if args.pilot:
                 for state in ('overview', 'editor'):
-                    report['cases'].append(capture(output, theme, mode, '1180x720', 10, args.tk_scaling, state, True, args.illustrations))
+                    report['cases'].append(capture(output, theme, mode, '1180x720', args.text_size or 10, args.tk_scaling, state, True, args.illustrations))
                     (output / 'report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     if args.release:
         release_cases = [('Simple', 'overview'), ('Advanced', 'overview'),
@@ -262,13 +345,24 @@ def main():
                          ('Simple', 'validation')]
         for theme in ('dark', 'light'):
             for mode, state in ([] if args.minimum_only else release_cases):
-                report['cases'].append(capture(output, theme, mode, '900x600', 10, args.tk_scaling,
+                report['cases'].append(capture(output, theme, mode, '900x600', args.text_size or 10, args.tk_scaling,
                                                state, illustrations=args.illustrations, release=True))
                 (output / 'report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
             for state in ('relationships', 'events', 'planned'):
-                report['cases'].append(capture(output, theme, 'Advanced', '760x480', 16, args.tk_scaling,
+                report['cases'].append(capture(output, theme, 'Advanced', '760x480', args.text_size or 16, args.tk_scaling,
                                                state, illustrations=args.illustrations, release=True))
                 (output / 'report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+    if args.support or args.support_only:
+        support_cases = [('welcome','660x450','500x350'), ('setup','480x400','360x280'),
+                         ('appearance','460x350','360x280'), ('credits','660x480','360x280'),
+                         ('recovery-backups','820x570','650x440'), ('recovery-trash','820x570','650x440'),
+                         ('recovery-drafts','820x570','650x440'), ('empty-simple','1180x720','760x480'),
+                         ('empty-advanced','1180x720','760x480')]
+        for theme in ('dark','light'):
+            for state, default, minimum in support_cases:
+                for size, text_size in (((minimum,16),) if args.minimum_only else ((default,10),(minimum,16))):
+                    report['cases'].append(capture_support(output, theme, state, size, args.text_size or text_size, args.illustrations, args.tk_scaling))
+                    (output / 'report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(output)
     fingerprints = {report['source_fingerprint']}
     for case in report['cases']:

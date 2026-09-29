@@ -8,7 +8,8 @@ from .database import Database
 from .sample_story import new_sample
 from .paths import validate_writable_location, resource
 from .theme import apply_theme
-from .widgets import wrapping_label
+from .widgets import wrapping_label, ActionBar
+from .ui_assets import decorate
 from .scroll_frame import ScrollFrame
 
 
@@ -49,16 +50,19 @@ class Welcome(tk.Tk):
         apply_theme(self, settings.values["theme"], settings.values["text_size"])
         if resource("story-atlas.ico").exists():
             self.iconbitmap(str(resource("story-atlas.ico")))
+        actions = ActionBar(self)
+        actions.pack(side='bottom', fill='x', padx=20, pady=12)
+        self.start_button = actions.add(ttk.Button(actions, text='Start empty', command=self.start_empty, style='Primary.TButton'))
+        self.open_button = actions.add(ttk.Button(actions, text='Open story…', command=self.open_story, style='Secondary.TButton'))
         scroller = ScrollFrame(self)
         scroller.pack(fill="both", expand=True, padx=24, pady=16)
         body = scroller.content
-        ttk.Label(body, text="Your next story starts here", style="Title.TLabel").pack(anchor="w")
+        decorate(wrapping_label(body, text="Your next story starts here", style="Heading.TLabel"), 'welcome', 48).pack(fill='x')
         wrapping_label(body, text="Keep characters, relationships, and story events together. Everything stays in local story files.").pack(fill="x", pady=14)
-        for label, action, text in (("Start empty", self.start_empty, "Name your story, first chapter, and opening event."),
-                                    ("Open story", self.open_story, "Continue an existing Story Atlas database."),
-                                    ("Try Greyhaven", self.try_sample, "18 characters, five character types, colored links, 3 chapters and 10 events."),
+        ttk.Label(body, text='Explore a sample', style='Heading.TLabel').pack(anchor='w', pady=(6, 2))
+        for label, action, text in (("Try Greyhaven", self.try_sample, "18 characters, five character types, colored links, 3 chapters and 10 events."),
                                     ("Try the modern prometheus", lambda: self.try_sample('prometheus'), "Explore Mary Shelley's Frankenstein through characters, events, and changing relationships. Contains the full story, including its ending.")):
-            ttk.Button(body, text=label, command=action, style="Accent.TButton").pack(anchor="w", pady=(8, 2))
+            ttk.Button(body, text=label, command=action, style="Secondary.TButton").pack(anchor="w", pady=(8, 2))
             wrapping_label(body, text=text, style="Muted.TLabel").pack(fill="x")
         hint = f"Data folder: {root_folder}"
         if legacy_path and legacy_path.is_file():

@@ -6,7 +6,7 @@ import sys
 
 from .migrations import CURRENT_VERSION
 
-APPLICATION_VERSION = "0.18.0"
+APPLICATION_VERSION = "0.19.0"
 
 
 def source_fingerprint(root=None):

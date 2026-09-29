@@ -86,4 +86,29 @@ def show_about(app):
 
 def show_artwork_credits(app):
     from .ui_assets import artwork_credits
-    return messagebox.showinfo('Artwork credits', artwork_credits(), parent=app)
+    from .paths import resource
+    from .widgets import read_only_text_area, set_read_only_text
+    dialog = tk.Toplevel(app)
+    dialog.title('Artwork credits')
+    dialog.geometry('660x480')
+    dialog.minsize(360, 280)
+    dialog.transient(app)
+    bar = ttk.Frame(dialog, padding=12)
+    bar.pack(side='bottom', fill='x')
+    ttk.Button(bar, text='Close', command=dialog.destroy, style='Secondary.TButton').pack(side='right')
+    body = ttk.Frame(dialog, padding=12)
+    body.pack(fill='both', expand=True)
+    ttk.Label(body, text='Artwork and licenses', style='Heading.TLabel').pack(anchor='w', pady=(0, 8))
+    text = artwork_credits()
+    for name in ('has-icons.txt', 'has-buildings.txt'):
+        try:
+            license_text = resource('ui/licenses/' + name).read_text(encoding='utf-8-sig')
+        except OSError:
+            license_text = 'License file unavailable. Restore the complete application package to view it.'
+        text += '\n\n' + name + '\n' + license_text
+    dialog.credits_text = read_only_text_area(body)
+    dialog.credits_text.pack(fill='both', expand=True)
+    set_read_only_text(dialog.credits_text, text)
+    dialog.bind('<Escape>', lambda _: dialog.destroy())
+    style_tree(dialog)
+    return dialog

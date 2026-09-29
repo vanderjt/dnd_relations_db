@@ -36,12 +36,12 @@ PALETTES = {
                  text="#e6edf7", muted="#a5b5c9", accent="#61d4bf", on_accent="#101722",
                  hover="#30435a", primary_hover="#80e5d1", primary_pressed="#43b8a6",
                  selected="#315469", navigation="#26364b", context_text="#ffe09a", success="#8ee6c9", error="#ffb4ab",
-                 disabled="#8190a3", border="#506078", focus="#9cecff"),
+                 disabled="#8190a3", border="#91a1b5", focus="#9cecff"),
     "light": dict(bg="#f3f6fa", panel="#ffffff", detail="#f7f9fc", input="#ffffff", context="#fff3d8",
                   text="#18283d", muted="#506078", accent="#146d61", on_accent="#ffffff",
                   hover="#e0e9f2", primary_hover="#0f5c52", primary_pressed="#0b4a42",
                   selected="#c8e4ef", navigation="#e8eef5", context_text="#705100", success="#116b52", error="#a12030",
-                  disabled="#687689", border="#8b9aab", focus="#075f9f"),
+                  disabled="#687689", border="#687789", focus="#075f9f"),
 }
 BG, PANEL, TEXT, MUTED, ACCENT = (PALETTES["dark"][key] for key in ("bg", "panel", "text", "muted", "accent"))
 
@@ -123,6 +123,8 @@ def apply_theme(root, mode="dark", text_size=10):
                      ("ToolActive.TButton", colors["selected"], colors["text"], colors["selected"], colors["selected"]))
     for name, background, foreground, hover, pressed in button_styles:
         style.configure(name, background=background, foreground=foreground, padding=(12, 7), borderwidth=1)
+        if name in ('Primary.TButton', 'Accent.TButton'):
+            style.configure(name, focuscolor=colors['on_accent'])
         style.map(name, background=[("disabled", colors["bg"]), ("pressed", pressed), ("active", hover)],
                   foreground=[("disabled", colors["disabled"])],
                   bordercolor=[("focus", colors["focus"])])
