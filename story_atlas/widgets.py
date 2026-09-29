@@ -141,6 +141,10 @@ class ActionBar(ttk.Frame):
             # Separate geometry containers prevent one wide control on another
             # row from silently widening every row's corresponding column.
             widget.grid(in_=frame, row=0, column=column, sticky="w", padx=(0, SPACE["small"]), pady=3)
+            # Widgets retain ActionBar as their Tk parent; the row is only their
+            # geometry master. A row created later must not cover its controls.
+            # Lift in item order to preserve Tk's sibling keyboard traversal.
+            widget.lift()
             column += 1
             used += needed
             row_height = max(row_height, widget.winfo_reqheight() + 6)

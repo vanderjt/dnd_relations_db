@@ -82,8 +82,19 @@ class NavigationOverhaulTests(unittest.TestCase):
         for text in ('Small', 'A significantly longer second control', 'A long first control in next row', 'Tiny'):
             bar.add(ttk.Button(bar, text=text))
         self.app.update()
+        # Native Tab traversal follows Tk sibling stacking order, not grid cells.
+        # Exercise multiple rows and a later reflow, as well as actual painting.
+        for geometry in ('520x240', '760x240', '520x240'):
+            window.geometry(geometry)
+            self.app.update()
+            for current, following in zip(bar.items, bar.items[1:]):
+                self.assertIs(current.tk_focusNext(), following)
+                self.assertIs(following.tk_focusPrev(), current)
         for widget in bar.items:
             self.assertLessEqual(widget.winfo_rootx() + widget.winfo_width(), bar.winfo_rootx() + bar.winfo_width())
+            hit = self.app.winfo_containing(widget.winfo_rootx() + widget.winfo_width() // 2,
+                                            widget.winfo_rooty() + widget.winfo_height() // 2)
+            self.assertIs(hit, widget, 'Row geometry container must not occlude its button')
         for child in bar.winfo_children():
             child.destroy()
         bar.items.clear()
