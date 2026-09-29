@@ -16,13 +16,13 @@ from .goals_view import CastGoalsDialog
 
 class CharactersView(ttk.Frame):
     def __init__(self, parent, database, changed, navigation=None):
-        super().__init__(parent, padding=16)
+        super().__init__(parent, padding=4)
         self.database, self.changed, self.navigation = database, changed, navigation
         self.character_id = None
         self.original = {}
         self.rows = {}
         self.draft = None
-        heading = ttk.Frame(self)
+        heading = self.heading_bar = ttk.Frame(self)
         heading.pack(fill='x', pady=(0, 8))
         ttk.Label(heading, text="Characters", style="Heading.TLabel").pack(side='left')
         ttk.Button(heading, text='Cast goals', style='Secondary.TButton',
@@ -47,6 +47,10 @@ class CharactersView(ttk.Frame):
         self.profile_menu = tk.Menu(self.profile_menu_button, tearoff=False)
         self.profile_menu.add_command(label='Duplicate character', command=self.duplicate)
         self.profile_menu.add_command(label='Delete character…', command=self.delete)
+        self.profile_menu.add_separator()
+        self.profile_menu.add_command(label='Done / Return', command=self.done)
+        self.profile_menu.add_command(label='Cast goals', command=lambda: CastGoalsDialog(self, self.database))
+        self.profile_menu.add_command(label='Chapters & events', command=lambda: self._root().tabs.select(self._root().events))
         self.profile_menu_button.configure(menu=self.profile_menu)
         self.undo_target = None
         self.undo_notice = ttk.Frame(editor, style="Context.TFrame", padding=6)
@@ -69,11 +73,31 @@ class CharactersView(ttk.Frame):
         self.search.trace_add("write", lambda *_: self.refresh())
         self.load(None)
         self.draft = DraftController(self)
-        self.draft_status_label = wrapping_label(editor, textvariable=self.draft.status, style="Context.TLabel")
-        self.draft_status_label.pack(side="bottom", fill="x")
+        self.draft_status_label = wrapping_label(editor, style="Context.TLabel")
+        self._draft_status_kind = 'muted'
         self.profile_tabs.pack_forget()
         self.profile_tabs.pack(fill="both", expand=True)
         self.refresh()
+        self.bind('<Configure>', self.compact_layout, add='+')
+
+    def compact_layout(self, event=None):
+        if event is not None and event.widget is not self:
+            return
+        compact = self.winfo_height() < 430
+        if compact == getattr(self, '_compact', None):
+            return
+        self._compact = compact
+        self.overview.compact_layout(compact)
+        self.roster.compact_layout(compact)
+        self.update_draft_notice()
+        if compact:
+            self.heading_bar.pack_forget()
+            self.done_button.grid_forget()
+            self.buttons.items = [self.primary_button, self.profile_menu_button]
+        else:
+            self.heading_bar.pack(fill='x', before=self.panes, pady=(0, 8))
+            self.buttons.items = [self.primary_button, self.done_button, self.profile_menu_button]
+        self.buttons.reflow()
 
     def update_actions(self, _event=None):
         editing = self.profile_tabs.select() == str(self.editor)
@@ -81,6 +105,7 @@ class CharactersView(ttk.Frame):
         self.done_button.configure(text='Done' if editing else 'Read mode', state='normal' if editing else 'disabled')
         for index in (0, 1):
             self.profile_menu.entryconfigure(index, state='normal' if self.character_id is not None else 'disabled')
+        self.update_draft_notice()
 
     def restore_pane(self, _event=None):
         if self.panes.winfo_width() < 100:
@@ -98,12 +123,29 @@ class CharactersView(ttk.Frame):
     def set_draft_status(self, text, kind="context"):
         """Keep recovery/unsaved context visible without presenting it as an error."""
         self.draft.status.set(text)
+        self._draft_status_kind = kind
         styles = {"context": "Context.TLabel", "success": "Success.TLabel", "muted": "Muted.TLabel", "error": "Error.TLabel"}
         self.draft_status_label.configure(style=styles[kind])
+        self.update_draft_notice()
+
+    def update_draft_notice(self):
+        if not hasattr(self, 'draft_status_label'):
+            return
+        dirty = self.values() != self.original
+        error = self._draft_status_kind == 'error'
+        if dirty or error:
+            text = self.draft.status.get()
+            if getattr(self, '_compact', False) and not error:
+                text = 'Recovered draft · unsaved' if text.startswith('Recovered draft') else 'Unsaved changes'
+            self.draft_status_label.configure(text=text, style='Error.TLabel' if error else 'Context.TLabel')
+            if not self.draft_status_label.winfo_manager():
+                self.draft_status_label.pack(side='bottom', fill='x', before=self.profile_tabs)
+        else:
+            self.draft_status_label.pack_forget()
 
     def show_undo_notice(self):
         self.undo_button.state(["!disabled"])
-        self.undo_notice.pack(side="bottom", fill="x", before=self.draft_status_label, pady=(4, 0))
+        self.undo_notice.pack(side="bottom", fill="x", before=self.profile_tabs, pady=(4, 0))
 
     def clear_undo(self):
         self.undo_target = None

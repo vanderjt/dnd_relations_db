@@ -13,6 +13,8 @@ from .goals_view import ParticipantGoalsDialog
 from .chronology_preview import confirm_preview
 from .event_detail_state import capture, restore
 from .event_context import EventContext
+from .illustrated_widgets import IllustratedLabel
+from .ui_assets import decorate
 
 
 class EventView(EventContext, ttk.Frame):
@@ -22,7 +24,7 @@ class EventView(EventContext, ttk.Frame):
         self.database, self.changed = database, changed
         self.database_path = database.path
         self.chapter_id = 'all'
-        ttk.Label(self, text="Chapters & story events", style="Heading.TLabel").pack(anchor="w", pady=(0, 2))
+        IllustratedLabel(self, 'section.chapter', text="Chapters & story events", size=24).pack(anchor="w", pady=(0, 2))
         self.actions = ActionBar(self)
         self.actions.pack(fill="x")
         self.new_event_button = self.actions.add(ttk.Button(self.actions, text="New event", style="Primary.TButton", command=self.edit))
@@ -52,6 +54,7 @@ class EventView(EventContext, ttk.Frame):
         self.workspace.add(self.detail, weight=2)
         self.detail_heading = tk.StringVar(self, "Event details")
         self.detail_heading_label = wrapping_label(self.detail, textvariable=self.detail_heading, style="Heading.TLabel", font='AtlasHeading')
+        decorate(self.detail_heading_label, 'section.event', 24)
         self.detail_heading_label.pack(fill='x', pady=(0, 4))
         self.detail_text = tk.StringVar(self, "Select an event to view its overview.")
         self.detail_actions = ActionBar(self.detail)
@@ -76,7 +79,7 @@ class EventView(EventContext, ttk.Frame):
         self.detail_scroller.pack(fill="both", expand=True)
         content = self.detail_scroller.content
         self.description_heading = tk.StringVar(self, "Description")
-        ttk.Label(content, textvariable=self.description_heading, style="Heading.TLabel").pack(anchor="w", pady=(0, 4))
+        IllustratedLabel(content, 'section.story', size=24, textvariable=self.description_heading).pack(anchor="w", pady=(0, 4))
         self.detail_body = read_only_text_area(content, height=4)
         self.detail_body.pack(fill="x", pady=(0, 12))
         set_read_only_text(self.detail_body, self.detail_text.get())
@@ -87,7 +90,7 @@ class EventView(EventContext, ttk.Frame):
         self.cast_body.pack(fill="x", pady=(0, 12))
         self.goals_section = ttk.Frame(content)
         self.goals_heading = tk.StringVar(self, "Characters and current goals")
-        ttk.Label(self.goals_section, textvariable=self.goals_heading, style="Heading.TLabel").pack(anchor="w", pady=(0, 4))
+        IllustratedLabel(self.goals_section, 'section.goals', size=24, textvariable=self.goals_heading).pack(anchor="w", pady=(0, 4))
         goals_frame = ttk.Frame(self.goals_section)
         goals_frame.pack(fill="x", pady=(0, 12))
         self.goals_tree = ttk.Treeview(goals_frame, show="tree", height=6, selectmode="browse")
@@ -121,12 +124,18 @@ class EventView(EventContext, ttk.Frame):
         self.outline = table(self.outline_frame, {"chapter": "Chapters"})
         self.outline.column("chapter", width=190, minwidth=120)
         self.outline.bind("<<TreeviewSelect>>", self.choose_outline)
+        from .tree_art import install_tree_art
+        self.refresh_outline_art = install_tree_art(self.outline,
+            lambda: {f"chapter:{row['id']}": row for row in self.database.chapters.list()},
+            lambda: self.database, lambda row: 'section.chapter')
         self.tree = table(self.event_frame, {"title": "Events in chapter"})
         self.tree.master.pack_configure(pady=2)
         self.tree.column("title", width=220, minwidth=120)
         self.tree.bind("<<TreeviewSelect>>", self.show_details)
         self.tree.bind("<Double-1>", lambda _: self.edit_selected())
         self.tree.bind("<Return>", lambda _: self.edit_selected())
+        self.refresh_event_art = install_tree_art(self.tree, lambda: self.rows,
+            lambda: self.database, lambda row: 'section.event')
         self.setup_reading()
         self.refresh()
 
@@ -170,6 +179,7 @@ class EventView(EventContext, ttk.Frame):
         outline_key = 'all' if self.chapter_id == 'all' else 'unassigned' if self.chapter_id is None else f'chapter:{self.chapter_id}'
         self.outline.selection_set(outline_key)
         self.outline.see(outline_key)
+        self.refresh_outline_art()
         self._refreshing_outline = False
         self.rows = {str(row["id"]): row for row in all_events
                      if self.chapter_id == 'all' or row['chapter_id'] == self.chapter_id}
@@ -180,6 +190,7 @@ class EventView(EventContext, ttk.Frame):
             if self.chapter_id == 'all':
                 title = f"{chapter_names.get(row['chapter_id'], 'Unassigned')} / {title}"
             self.tree.insert("", "end", iid=key, values=(title,))
+        self.refresh_event_art()
         if selected and selected[0] in self.rows:
             self.tree.selection_set(selected[0])
         self.show_details()

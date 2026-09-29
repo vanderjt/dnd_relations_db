@@ -1,6 +1,7 @@
 from .character_type import color as type_color, label as type_label_text
 """Persistent Matplotlib axes and one pickable arrow per relationship."""
 from collections import defaultdict
+import textwrap
 from matplotlib.patches import FancyArrowPatch
 from matplotlib.lines import Line2D
 import networkx as nx
@@ -28,13 +29,30 @@ class GraphRenderer:
     def layout_legend(self):
         """Reserve a header for the key so it never covers character nodes."""
         legend = self.axes.get_legend()
+        height_points = self.figure.get_figheight() * 72
+        width_points = self.figure.get_figwidth() * 72
+        title = getattr(self.figure, '_suptitle', None)
+        compact = height_points < 260 or width_points < 340
+        if title is not None:
+            title.set_visible(not compact)
+        if legend is not None:
+            legend.set_visible(not compact)
+        if compact:
+            self.figure.subplots_adjust(top=.94, bottom=.08)
+            self.refresh_label_density()
+            return
         if legend is None:
             self.figure.subplots_adjust(top=.92)
+            self.refresh_label_density()
             return
         font = legend.get_texts()[0].get_fontsize()
-        height_points = self.figure.get_figheight() * 72
         reserved = 5 * font * 1.5 + 38  # Five rows plus scope title and padding.
         self.figure.subplots_adjust(top=max(.25, 1 - reserved / max(height_points, 1)))
+        self.refresh_label_density()
+
+    def refresh_label_density(self):
+        if getattr(self, 'graph', None):
+            self.highlight(getattr(self, '_last_selection', None))
 
     def draw(self, graph, positions, pins, labels=True, colors=None, text_size=10, limits=None, selection=None):
         self.draw_count += 1
@@ -118,9 +136,18 @@ class GraphRenderer:
                     self.edge_labels[ident].set_position(self.label_point(source, target, radius))
 
     def highlight(self, selection):
+        self._last_selection = selection
         if not self.graph:
             return
         selected_node = selection[1] if selection and selection[0] == "node" else None
+        # Labels need physical reading space, not just a small record count.
+        # Keep deliberate selection/focus/pin/ordered cues regardless of density.
+        font_points = next(iter(self.node_labels.values())).get_fontsize()
+        font_pixels = font_points * self.figure.dpi / 72
+        area = max(1, self.axes.bbox.width * self.axes.bbox.height)
+        label_area = max(120, font_pixels * 12) * max(36, font_pixels * 3.5)
+        self.label_budget = max(2, min(35, int(area / label_area)))
+        edge_budget = min(60, self.label_budget * 2)
         near = {selected_node, self.focus}
         for node in tuple(near):
             if node in self.graph:
@@ -152,9 +179,35 @@ class GraphRenderer:
                 states.append("SELECTED")
             if node in self.pins:
                 states.append("PINNED")
-            self.node_labels[node].set_text(f"{self.graph.nodes[node]['name']}" +
-                                              (f"\n{' · '.join(states)}" if states else ""))
-            self.node_labels[node].set_visible(len(self.nodes) <= 35 or node in near or node in self.pins or node in ordered)
+            name = self.graph.nodes[node]['name']
+            narrow = self.figure.get_figwidth() * 72 < 340
+            if narrow:
+                name = '\n'.join(textwrap.wrap(textwrap.shorten(name, width=36, placeholder='…'), width=18))
+                states = [state.replace('PLANNED · not introduced yet', 'PLANNED').replace('NEW CHARACTER · unsaved', 'UNSAVED') for state in states]
+            state_text = ' · '.join(states)
+            if narrow:
+                state_text = '\n'.join(textwrap.wrap(state_text, width=22))
+            self.node_labels[node].set_text(name +
+                                              (f"\n{state_text}" if states else ""))
+            label = self.node_labels[node]
+            # A provisional node's model position can be removed before the
+            # pending redraw clears its artist. The artist still has an anchor.
+            x, y = self.axes.transData.transform(label.xy)
+            sparse = len(self.nodes) <= self.label_budget
+            right = narrow and not sparse and x > self.axes.bbox.x0 + self.axes.bbox.width * .7
+            left = narrow and not sparse and x < self.axes.bbox.x0 + self.axes.bbox.width * .3
+            below = narrow and y < self.axes.bbox.y0 + self.axes.bbox.height * .45
+            label.set_ha('right' if right else 'left' if left else 'center')
+            label.set_va('bottom' if below else 'top')
+            label.set_position((-8 if right else 8 if left else 0, 18 if below else -18))
+            if narrow and sparse:
+                get_renderer = getattr(self.figure.canvas, 'get_renderer', None)
+                if get_renderer:
+                    bounds = label.get_window_extent(get_renderer())
+                    shift = max(0, 4 - bounds.x0) - max(0, bounds.x1 - self.figure.bbox.width + 4)
+                    if shift:
+                        label.set_position((shift * 72 / self.figure.dpi, 18 if below else -18))
+            self.node_labels[node].set_visible(len(self.nodes) <= self.label_budget or node in near or node in self.pins or node in ordered)
         for ident, patch in self.edge_artists.items():
             changed = ident in getattr(self, 'changed_ids', set())
             patch.set_linewidth(4.5 if selection == ('edge', ident) else 3 if changed else 1.5)
@@ -162,7 +215,7 @@ class GraphRenderer:
                 source, target, _ = self.curves[ident]
                 data = self.graph.edges[source, target, ident]
                 self.edge_labels[ident].set_text(f"{type_label(data)}{' ↔' if mutual(data) else ''}" + (' · ENDED HERE' if data.get('ended_here') else ' · CHANGED' if changed else ''))
-                self.edge_labels[ident].set_visible(self.show_labels and (len(self.edge_artists) <= 60 or selection == ('edge', ident) or selected_node in (source, target) or changed))
+                self.edge_labels[ident].set_visible(self.show_labels and (len(self.edge_artists) <= edge_budget or selection == ('edge', ident) or selected_node in (source, target) or changed))
 
     def pick_node(self, event):
         if not self.graph:

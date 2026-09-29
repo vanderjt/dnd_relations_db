@@ -26,7 +26,8 @@ class SimpleWorkspace(ttk.Frame):
         self.task = None
         self.recent_creation = None
         self.context = tk.StringVar(self)
-        wrapping_label(self, textvariable=self.context, style='Context.TLabel').pack(fill='x', padx=12)
+        self.context_label = wrapping_label(self, textvariable=self.context, style='Context.TLabel')
+        self.context_label.pack(fill='x', padx=12)
         self.ribbon = ribbon = ActionBar(self)
         ribbon.pack(fill='x', padx=12)
         ribbon.add(ttk.Button(ribbon, text='New character', command=self.new_character))
@@ -121,12 +122,26 @@ class SimpleWorkspace(ttk.Frame):
             return
         import tkinter.font as font
         compact = self.winfo_width() < 1050 or font.nametofont('TkDefaultFont').metrics('linespace') > 24
-        if compact == self.compact:
+        short = self._root().winfo_height() < 540
+        if compact == self.compact and short == getattr(self, '_short', None):
             return
         self.compact = compact
+        self._short = short
+        self.context_label.pack_forget()
+        if not compact:
+            self.context_label.pack(fill='x', padx=12, before=self.ribbon)
         for widget in self.ribbon_full:
             widget.grid_forget()
         self.ribbon.items = self.ribbon_compact if compact else self.ribbon_full
+        # Retain frequent time actions in the menu when the window is short.
+        for label in ('New event', 'Next event'):
+            for index in reversed(range(self.more_menu.index('end') + 1)):
+                if self.more_menu.type(index) != 'separator' and self.more_menu.entrycget(index, 'label') == label:
+                    self.more_menu.delete(index)
+        if short:
+            self.ribbon.items = [item for item in self.ribbon_full if item.cget('text') not in ('New event', 'Next event')]
+            self.more_menu.insert_command(0, label='Next event', command=self.continue_event)
+            self.more_menu.insert_command(0, label='New event', command=self.new_event)
         self.ribbon.reflow()
         self.selection_toggle.pack_forget()
         self.selection_toggle.pack(fill='x', before=self.host)
@@ -161,8 +176,37 @@ class SimpleWorkspace(ttk.Frame):
         self.timeline.refresh()
         title = self.database.connection.execute("SELECT value FROM story_metadata WHERE key='title'").fetchone()
         title = title[0] if title else self.database.path.stem
-        self.context.set(title[:32] if self.compact else f"{title} · {self.timeline.chapter.get()} · {self.timeline.event.get()}")
+        self.context.set(f"{title} · {self.timeline.chapter.get()} · {self.timeline.event.get()}")
+        self.refresh_context()
         self.update_selection()
+
+    def refresh_context(self):
+        if not hasattr(self, 'timeline') or not self.compact:
+            return
+        graph = self.graph
+        filters = []
+        if graph.classification_filter:
+            filters.append(graph.classification_filter)
+        if graph._focus_id is not None:
+            filters.append('Focus: ' + graph.focus.get())
+        if graph.kind.get() != 'All types':
+            filters.append(graph.kind.get())
+        if graph.depth.get() != 'Full graph':
+            filters.append(graph.depth.get())
+        if graph.direction.get() != 'Both':
+            filters.append(graph.direction.get())
+        if not graph.isolates.get():
+            filters.append('Isolates hidden')
+        if graph.show_planned.get():
+            filters.append('Planned cast shown')
+        if graph.changes_only.get():
+            filters.append('Changes only')
+        if graph.highlight_changes.get():
+            filters.append('Changes highlighted')
+        self.context_label.pack_forget()
+        if filters:
+            self.context.set('View: ' + ' · '.join(filters))
+            self.context_label.pack(fill='x', padx=12, before=self.ribbon)
 
     def update_selection(self):
         names = {row['id']: row['name'] for row in self.database.characters()}

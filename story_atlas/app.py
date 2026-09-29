@@ -104,6 +104,7 @@ class StoryAtlas(tk.Tk):
         self.status = tk.StringVar(value=f"Ready  ·  Local database: {self.database.path}")
         self.status_label = wrapping_label(self, textvariable=self.status, style="Muted.TLabel", padding=(16, 6))
         self.status_label.pack(fill="x")
+        self.bind('<Configure>', self.compact_chrome, add='+')
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.bind("<Control-s>", lambda _: self.simple.task.save() if self.mode.get() == 'Simple' and self.simple.task else self.characters.save() if self.mode.get() == 'Advanced' and self.tabs.select() == str(self.characters) else None)
         self.bind("<Control-k>", lambda _: self.projects.search())
@@ -147,6 +148,20 @@ class StoryAtlas(tk.Tk):
             self.tabs.atlas_images.append(image)
             self.tabs.tab(view, image=image or '', compound='left')
 
+    def compact_chrome(self, event=None):
+        if event is not None and event.widget is not self:
+            return
+        compact = self.winfo_height() < 620
+        if compact == getattr(self, '_compact_chrome', None):
+            return
+        self._compact_chrome = compact
+        if compact:
+            self.guidance.pack_forget()
+            self.status_label.configure(padding=(12, 2))
+        elif hasattr(self, 'mode') and self.mode.get() == 'Advanced':
+            self.guidance.pack(fill='x', before=self.tabs)
+            self.status_label.configure(padding=(16, 6))
+
     def apply_mode(self):
         for widget in self.header_items:
             widget.grid_forget()
@@ -162,6 +177,8 @@ class StoryAtlas(tk.Tk):
             self.simple.pack_forget()
             self.guidance.pack(fill='x', before=self.status_label)
             self.tabs.pack(fill='both', expand=True, padx=12, before=self.status_label)
+            if self.winfo_height() < 620:
+                self.guidance.pack_forget()
             if self.tabs.select() == str(self.graph) and self.graph.is_visible():
                 self.graph.ensure_current()
 

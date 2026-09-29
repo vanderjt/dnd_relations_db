@@ -133,7 +133,8 @@ class AppearanceTests(unittest.TestCase):
                 self.app.update()
                 self.app.graph.controls.reflow()
                 self.app.update()
-                for button in self.app.graph.controls.items:
+                graph = self.app.graph
+                for button in (graph.filters.items if getattr(graph, '_compact', False) else graph.controls.items):
                     self.assert_inside(button, self.app)
                 self.assertGreater(self.app.graph.canvas.get_tk_widget().winfo_height(), 100)
         self.assertEqual(self.callback_errors, [])
@@ -164,7 +165,7 @@ class AppearanceTests(unittest.TestCase):
             self.app.tabs.select(view)
             self.app.update()
             if view is self.app.graph:
-                for button in view.controls.items:
+                for button in (view.filters.items if getattr(view, '_compact', False) else view.controls.items):
                     self.assert_inside(button, self.app)
             elif view is self.app.characters:
                 for button in view.buttons.items:

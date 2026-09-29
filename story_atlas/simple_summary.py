@@ -17,6 +17,25 @@ class CharacterSummary(ttk.Frame):
         bar.add(ttk.Button(bar, text='Connect…', command=lambda: workspace.connect(row['id'])))
         self.delete_button = bar.add(ttk.Button(bar, text='Delete', style='Danger.TButton',
                                                 command=lambda: workspace.trash_character(row['id'])))
+        # A short task pane must reserve height for the saved profile itself.
+        import tkinter as tk
+        full_actions = list(bar.items)
+        actions = ttk.Menubutton(bar, text='Actions')
+        menu = tk.Menu(actions, tearoff=False)
+        menu.add_command(label='Connect…', command=lambda: workspace.connect(row['id']))
+        menu.add_command(label='Delete character…', command=lambda: workspace.trash_character(row['id']))
+        actions.configure(menu=menu)
+        def adapt(_event=None):
+            short = self._root().winfo_height() < 540
+            if short == getattr(self, '_short', None):
+                return
+            self._short = short
+            for control in [*full_actions, actions]:
+                control.grid_forget()
+            full_actions[0].configure(text='Edit' if short else 'Edit character')
+            bar.items = [full_actions[0], actions] if short else list(full_actions)
+            bar.reflow()
+        self.bind('<Configure>', adapt, add='+')
         scroll = ScrollFrame(self)
         scroll.pack(fill='both', expand=True)
         body = scroll.content

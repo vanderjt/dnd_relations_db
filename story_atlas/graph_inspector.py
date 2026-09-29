@@ -63,6 +63,10 @@ class GraphInspector(ttk.Frame):
             data = graph.nodes[self.node]
             self.heading.configure(text=f"{data['name']} · #{self.node}")
             state = ["Selected in the inspector."]
+            if data.get('planned'):
+                state.insert(0, 'Planned character · not introduced at the selected event.')
+            if data.get('provisional'):
+                state.insert(0, 'New character · not saved yet.')
             state.append(f"Focus: on (scope is {getattr(self, 'focus_scope', 'Full graph')})." if self.node == getattr(self, "focus_id", None)
                          else "Focus: off.")
             state.append("Pinned: on (dragging keeps this position)." if self.node in pins
