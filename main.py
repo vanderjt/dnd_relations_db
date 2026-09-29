@@ -20,7 +20,7 @@ def main():
         # Conda's Tcl 8.6.15 fails to initialize when its library is supplied
         # as a long absolute Windows path. Resolve CLI paths first, then keep
         # the bundled libraries reachable by short paths relative to the EXE.
-        for name in ('database', 'data_dir', 'self_test'):
+        for name in ('database', 'data_dir', 'self_test'): 
             value = getattr(args, name)
             if value is not None:
                 setattr(args, name, value.expanduser().resolve())
