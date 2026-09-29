@@ -19,8 +19,8 @@ and focus interference. All test stories/settings are disposable.
 | Branch | Scope | State |
 |---|---|---|
 | `gui-overhaul/01-foundation` | Curated assets, provenance, image cache, shared components, character pilot, validation capture tool | Merged PR #1; 233 tests passed; pulled `aacf783` |
-| `gui-overhaul/02-navigation` | Header, menus, Simple toolbar, Advanced navigation, help references | In progress |
-| `gui-overhaul/03-workspaces` | Roster/search, relationship details, chronology, graph inspector | Pending |
+| `gui-overhaul/02-navigation` | Header, menus, Simple toolbar, Advanced navigation, help references | Merged PR #2; 237 tests passed; pulled `6ddb63c` |
+| `gui-overhaul/03-workspaces` | Roster/search, relationship details, chronology, graph inspector | In progress |
 | `gui-overhaul/04-support-release` | Welcome, setup, appearance/credits, support screens, release verification and packaging | Pending |
 
 The roadmap's later product opportunities (map editor, structured inventory,

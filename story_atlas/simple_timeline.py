@@ -71,6 +71,8 @@ class Timeline(ttk.Frame):
         colors = palette(self)
         self.canvas.configure(bg=colors['panel'])
         self.canvas.delete('all')
+        height = max(24, self.canvas.winfo_height())
+        compact = height < 60
         width = max(100, self.canvas.winfo_width()) - 32
         spacing = width / max(1, len(self.ids) - 1)
         chapter_names = {row['id']: row['title'] for row in self.workspace.database.chapters.list()}
@@ -81,18 +83,19 @@ class Timeline(ttk.Frame):
                 groups.append([chapter, i, i])
             else:
                 groups[-1][2] = i
-        for chapter, start, end in groups:
+        for chapter, start, end in ([] if compact else groups):
             x0, x1 = 16 + (start - .4) * spacing, 16 + (end + .4) * spacing
             self.canvas.create_rectangle(x0, 3, x1, 27, outline=colors['border'])
             self.canvas.create_text((x0 + x1) / 2, 15, text=chapter_names.get(chapter, 'Unassigned')[:30], fill=colors['text'], width=max(20, x1-x0))
         index = self.preview_index if self.preview_index is not None else self.ids.index(self.workspace.graph.as_of_id)
         for i in range(len(self.ids)):
             x = 16 + i * spacing
-            self.canvas.create_oval(x-3, 37, x+3, 43, fill=colors['muted'], outline='')
+            dot_y = 10 if compact else 40
+            self.canvas.create_oval(x-3, dot_y-3, x+3, dot_y+3, fill=colors['muted'], outline='')
         x = 16 + index * spacing
-        self.canvas.create_line(x, 28, x, 61, fill=colors['focus'], width=3)
-        self.canvas.create_text(16, 55, text='Before', anchor='w', fill=colors['muted'])
-        self.canvas.create_text(width + 16, 55, text='Current', anchor='e', fill=colors['muted'])
+        self.canvas.create_line(x, 3 if compact else 28, x, height-3, fill=colors['focus'], width=3)
+        self.canvas.create_text(16, height-3, text='Before', anchor='sw', fill=colors['muted'])
+        self.canvas.create_text(width + 16, height-3, text='Current', anchor='se', fill=colors['muted'])
 
     def scrub(self, event):
         width = max(100, self.canvas.winfo_width()) - 32

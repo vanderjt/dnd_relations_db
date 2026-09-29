@@ -33,7 +33,8 @@ class GraphView(GraphTime, GraphActions, ttk.Frame):
         self.as_of_id = None
         self.as_of = tk.StringVar(self, CURRENT_SCOPE)
         self.event_choices = {}
-        ttk.Label(self, text="Relationship graph", style="Heading.TLabel").pack(anchor="w")
+        self.title_label = ttk.Label(self, text="Relationship graph", style="Heading.TLabel")
+        self.title_label.pack(anchor='w')
         scope_panel = ttk.Frame(self, style="Content.TFrame", padding=(0, 2))
         scope_panel.pack(fill="x", pady=(4, 0))
         self.filters = ActionBar(scope_panel)
@@ -91,6 +92,35 @@ class GraphView(GraphTime, GraphActions, ttk.Frame):
         self.renderer.draw(self.graph, {}, set(), colors=palette(self))
         self.controls.fit_callback = self.fit_graph
         self.last_motion = 0
+        self.full_filters = list(self.filters.items)
+        self.bind('<Configure>', self.compact_layout, add='+')
+
+    def compact_layout(self, event=None):
+        if event is not None and event.widget is not self:
+            return
+        compact = self._root().winfo_height() < 620
+        if compact == getattr(self, '_compact', None):
+            return
+        self._compact = compact
+        self.title_label.pack_forget()
+        if not compact and self.__class__ is GraphView:
+            self.title_label.pack(anchor='w', before=self.filters.master)
+        for widget in self.full_filters:
+            widget.grid_forget()
+        self.event_box.configure(width=18 if compact else 24)
+        self.previous_button.configure(text='Previous' if compact else '← Previous', width=0)
+        self.next_button.configure(text='Next' if compact else 'Next →', width=0)
+        self.filter_menu_button.configure(width=0)
+        self.filters.items = [self.event_box, self.previous_button, self.next_button, self.filter_menu_button] if compact else list(self.full_filters)
+        self.filters.reflow()
+        if self.__class__ is GraphView:
+            self.controls.master.pack_forget()
+            if not compact:
+                self.controls.master.pack(fill='x', pady=(4, 0), before=self.summary)
+        # Configure may precede Map when a hidden tab is first selected. Its
+        # presentation must be updated then too; otherwise ensure_current sees
+        # a clean graph and leaves the previous, full-height scope summary.
+        self.refresh(force=True)
 
     def graph_characters(self):
         from .introductions import visible_cast
@@ -160,6 +190,18 @@ class GraphView(GraphTime, GraphActions, ttk.Frame):
 
     def rebuild_filter_menu(self, kinds):
         self.filter_menu.delete(0, "end")
+        focus = tk.Menu(self.filter_menu, tearoff=False)
+        focus.add_command(label='All characters', command=lambda: self.focus_node(None))
+        for name, ident in self.focus_choices.items():
+            focus.add_command(label=name, command=lambda ident=ident: self.focus_node(ident))
+        self.filter_menu.add_cascade(label='Focus character', menu=focus)
+        depth = tk.Menu(self.filter_menu, tearoff=False)
+        for value in ('Full graph', 'Direct', 'Two steps'):
+            depth.add_radiobutton(label=value, variable=self.depth, value=value, command=self.filter_changed)
+        self.filter_menu.add_cascade(label='Focus scope', menu=depth)
+        self.filter_menu.add_checkbutton(label='Show labels', variable=self.labels, command=self.filter_changed)
+        if hasattr(self, 'controls'):
+            self.filter_menu.add_cascade(label='Graph navigation & layout', menu=self.controls.actions)
         self.filter_menu.add_checkbutton(label="Show planned cast (future; no active connections)", variable=self.show_planned, command=lambda: self.refresh(force=True))
         direction = tk.Menu(self.filter_menu, tearoff=False)
         for value in ("Both", "Incoming", "Outgoing"):
@@ -267,6 +309,23 @@ class GraphView(GraphTime, GraphActions, ttk.Frame):
                                text=f"{self.displayed_scope()}: " + " · ".join(scope)
                                     + (f" · Event changes: {len(changes)} ({sum(row['ended_here'] for row in changes)} endings; use Changes only to inspect endings)" if self.highlight_changes.get() else '')
                                     + f"  —  {len(self.graph)} characters, {self.graph.number_of_edges()} relationships")
+        if getattr(self, '_compact', False):
+            active = []
+            if self._focus_id is not None:
+                active.extend([self.focus.get(), self.depth.get()])
+            if self.kind.get() != 'All types':
+                active.append(self.kind.get())
+            if self.direction.get() != 'Both':
+                active.append(self.direction.get())
+            if self.show_planned.get():
+                active.append('Planned cast')
+            if self.changes_only.get():
+                active.append('Changes only')
+            if self.highlight_changes.get():
+                active.append('Changes highlighted')
+            if not self.isolates.get():
+                active.append('Isolates hidden')
+            self.summary.configure(text=f'{len(self.graph)} characters · {self.graph.number_of_edges()} connections' + (' · ' + ' · '.join(active) if active else ''))
         self.last_refresh_seconds = time.perf_counter() - started
 
     def fit_graph(self):

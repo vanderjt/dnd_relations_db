@@ -21,7 +21,13 @@ class GraphControls(ActionBar):
         self.pan = self.add(ttk.Button(self, text="Pan", style="Secondary.TButton", command=lambda: self.toggle("pan")))
         self.add(ttk.Button(self, text="Fit", style="Secondary.TButton", command=self.fit))
         more = ttk.Menubutton(self, text="View & layout", style="Secondary.TMenubutton")
-        actions = tk.Menu(more, tearoff=False)
+        self.actions = actions = tk.Menu(more, tearoff=False)
+        self.zoom_active = tk.BooleanVar(self, False)
+        self.pan_active = tk.BooleanVar(self, False)
+        actions.add_checkbutton(label='Zoom rectangle', variable=self.zoom_active, command=lambda: self.toggle('zoom'))
+        actions.add_checkbutton(label='Pan tool', variable=self.pan_active, command=lambda: self.toggle('pan'))
+        actions.add_command(label='Fit view', command=self.fit)
+        actions.add_separator()
         actions.add_command(label="Back", command=self.navigation.back)
         actions.add_command(label="Forward", command=self.navigation.forward)
         actions.add_separator()
@@ -34,6 +40,14 @@ class GraphControls(ActionBar):
         actions.add_command(label="Saved views…", command=saved_views)
         actions.add_separator()
         actions.add_command(label="Export snapshot…", command=export)
+        from .graph_legend import add_menu_explanations
+        from .character_type import TYPE_COLORS
+        legend = tk.Menu(actions, tearoff=False)
+        for label, color in TYPE_COLORS.items():
+            legend.add_command(label='● ' + label, foreground=color, state='disabled')
+        add_menu_explanations(legend)
+        actions.add_separator()
+        actions.add_cascade(label='Legend · dots & links', menu=legend)
         more.configure(menu=actions)
         self.add(more)
 
@@ -42,6 +56,8 @@ class GraphControls(ActionBar):
         self.update_buttons()
 
     def update_buttons(self):
+        self.zoom_active.set(self.navigation.mode.name == 'ZOOM')
+        self.pan_active.set(self.navigation.mode.name == 'PAN')
         self.zoom.configure(style="ToolActive.TButton" if self.navigation.mode.name == "ZOOM" else "Secondary.TButton")
         self.pan.configure(style="ToolActive.TButton" if self.navigation.mode.name == "PAN" else "Secondary.TButton")
 

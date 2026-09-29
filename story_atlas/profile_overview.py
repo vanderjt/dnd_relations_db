@@ -18,7 +18,8 @@ class ProfileOverview(ttk.Frame):
         self.scroller = ScrollFrame(self)
         self.scroller.pack(fill="both", expand=True)
         body = self.scroller.content
-        wrapping_label(body, text='Current — after the last event\nCurrent profile and goals · not historically versioned', style='Context.TLabel').pack(fill='x', pady=4)
+        self.context = wrapping_label(body, text='Current — after the last event\nCurrent profile and goals · not historically versioned', style='Context.TLabel')
+        self.context.pack(fill='x', pady=4)
         self.identity = IdentityHeader(body)
         self.identity.pack(fill='x')
         self.name, self.details, self.portrait = self.identity.name, self.identity.details, self.identity.portrait
@@ -30,7 +31,7 @@ class ProfileOverview(ttk.Frame):
         self.goals.pack(fill="x", pady=6)
         self.completion = wrapping_label(body, style="Muted.TLabel")
         self.completion.pack(fill="x", pady=(4, 0))
-        wrapping_label(body, text="This overview shows the saved profile. Uncommitted edits stay in Edit profile.",
+        wrapping_label(body, text="This overview shows the current saved profile and goals; they are not historically versioned. Uncommitted edits stay in Edit profile.",
                        style="Muted.TLabel").pack(fill="x", pady=8)
         bar = ActionBar(body)
         bar.pack(fill="x")
@@ -45,6 +46,11 @@ class ProfileOverview(ttk.Frame):
         self.links = []
         self.relationship_actions = {}
         self.character_id = None
+
+    def compact_layout(self, compact):
+        self.context.configure(text='Current saved profile' if compact else
+            'Current — after the last event\nCurrent profile and goals · not historically versioned',
+            style='Muted.TLabel' if compact else 'Context.TLabel')
 
     def refresh(self, character_id):
         self.character_id = character_id
@@ -66,8 +72,8 @@ class ProfileOverview(ttk.Frame):
             return
         self.add_button.state(["!disabled"])
         self.name.configure(text=f"{row['name']}  ·  #{row['id']}")
-        self.details.configure(text="\n".join(f"{label}: {row[field] or 'Not set'}" for field, label in (
-            ("character_type", "Character type"), ("role", "Role"), ("status", "Status"), ("faction", "Faction"), ("location", "Location"), ("tags", "Tags"))))
+        self.details.configure(text="\n".join(f"{label}: {row[field]}" for field, label in (
+            ("character_type", "Character type"), ("role", "Role"), ("status", "Status"), ("faction", "Faction"), ("location", "Location"), ("tags", "Tags")) if row[field]))
         self.summary.configure(text=row["summary"] or "No summary yet. Add a few sentences in Edit profile → Story.")
         self.goals.configure(text=row["goals"] or "What does this character want? Add immediate objectives, long-term ambitions, and obstacles in Edit goals.")
         self.photo = self.identity.show_portrait(database.assets, row['portrait'])

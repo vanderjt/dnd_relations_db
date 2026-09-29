@@ -93,7 +93,10 @@ class GraphActions:
                         time_scope=self.as_of.get(), display_scope=self.displayed_scope(), profile_scope='Current profile, classification and goals; not historically versioned',
                         characters=[data for _, data in self.graph.nodes(data=True)],
                         relationships=[dict(data, baseline_active=0 if data.get('ended_here') else 1) for _, _, data in self.graph.edges(data=True)])
+        original_size = self.figure.get_size_inches().copy()
         try:
+            self.figure.set_size_inches(max(9, original_size[0]), max(6, original_size[1]), forward=False)
+            self.renderer.layout_legend()
             self.canvas.draw()
             self.figure.savefig(image_path, dpi=180, facecolor=palette(self)["bg"])
             data_path.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -101,4 +104,8 @@ class GraphActions:
         except OSError as error:
             messagebox.showerror("Export failed", str(error), parent=self)
             return
+        finally:
+            self.figure.set_size_inches(original_size, forward=False)
+            self.renderer.layout_legend()
+            self.canvas.draw_idle()
         self.changed(f"Graph snapshot saved to {image_path}")

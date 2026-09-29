@@ -3,6 +3,12 @@ from .graph_view import GraphView
 
 
 class SimpleGraph(GraphView):
+    def refresh(self, *args, **kwargs):
+        result = super().refresh(*args, **kwargs)
+        if hasattr(self.workspace, 'graph'):
+            self.workspace.refresh_context()
+        return result
+
     def __init__(self, parent, workspace):
         self.workspace = workspace
         self.classification_filter = None

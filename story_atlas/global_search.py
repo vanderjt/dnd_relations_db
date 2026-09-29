@@ -36,6 +36,9 @@ class SearchDialog(tk.Toplevel):
         wrapping_label(body, textvariable=self.notice, style="Muted.TLabel").pack(fill="x")
         self.tree = table(body, {"kind": "Match", "title": "Story record", "snippet": "Matching context"})
         self.tree.column("kind", width=145, stretch=False)
+        from .tree_art import install_tree_art
+        self.refresh_art = install_tree_art(self.tree, lambda: self.results, lambda: self.app.database,
+            lambda row: {'character': 'section.identity', 'chapter': 'section.chapter', 'event': 'section.event', 'history': 'section.notes'}.get(row.get('kind')))
         self.tree.bind("<<TreeviewSelect>>", self.remember_selection)
         self.tree.bind("<Double-1>", self.open_selected)
         self.bind("<Return>", self.open_selected)
@@ -59,6 +62,7 @@ class SearchDialog(tk.Toplevel):
         self.tree.delete(*self.tree.get_children())
         for key, row in self.results.items():
             self.tree.insert("", "end", iid=key, values=(row["kind"].title(), row["title"], row["snippet"]))
+        self.refresh_art()
         selected = self.state.get("selection")
         if selected in self.results:
             self.tree.selection_set(selected)

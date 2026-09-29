@@ -17,9 +17,11 @@ class RelationshipsView(ttk.Frame):
         self.database_path = database.path
         self.character_id = None
         self._pane_restored = False
-        ttk.Label(self, text="Relationships", style="Heading.TLabel").pack(anchor="w")
-        wrapping_label(self, text='Current — after the last event\n' + LEGEND,
-                  style="Muted.TLabel").pack(fill="x", pady=(0, 8))
+        self.title_label = ttk.Label(self, text="Relationships", style="Heading.TLabel")
+        self.title_label.pack(anchor='w')
+        self.context_label = wrapping_label(self, text='Current — after the last event\n' + LEGEND,
+                  style="Muted.TLabel")
+        self.context_label.pack(fill="x", pady=(0, 8))
         global_panel = ttk.Frame(self)
         global_panel.pack(fill="x", pady=(0, 8))
         bar = ActionBar(global_panel)
@@ -30,6 +32,20 @@ class RelationshipsView(ttk.Frame):
                            style="Secondary.TButton"))
         bar.add(ttk.Button(bar, text="Explore graph", command=lambda: self.winfo_toplevel().tabs.select(self.winfo_toplevel().graph),
                            style="Navigation.TButton"))
+        self.full_actions = list(bar.items)
+        self.compact_menu = ttk.Menubutton(bar, text='More')
+        compact_menu = tk.Menu(self.compact_menu, tearoff=False)
+        compact_menu.add_command(label='All relationship history', command=self.all_history)
+        compact_menu.add_command(label='Explore graph', command=lambda: self._root().tabs.select(self._root().graph))
+        compact_menu.add_command(label='Direction legend', command=lambda: messagebox.showinfo('Relationship direction', LEGEND, parent=self))
+        compact_menu.add_separator()
+        compact_menu.add_command(label='Read selected connection…', command=self.read_selected)
+        compact_menu.add_command(label='Correct selected entry…', command=self.edit_selected)
+        compact_menu.add_command(label='Selected history / story change…', command=self.history)
+        compact_menu.add_command(label='Consolidate selected reciprocal…', command=self.consolidate)
+        compact_menu.add_command(label='Delete selected connection…', command=self.delete)
+        self.compact_actions_menu = compact_menu
+        self.compact_menu.configure(menu=compact_menu)
         self.undo_target = None
         self.undo_notice = ttk.Frame(global_panel, style="Context.TFrame", padding=6)
         ttk.Label(self.undo_notice, text="Relationship moved to Trash.", style="Context.TLabel").pack(side="left")
@@ -45,13 +61,16 @@ class RelationshipsView(ttk.Frame):
         self.panes.add(right, weight=3)
         self.panes.bind('<Configure>', self.restore_pane)
         self.heading = wrapping_label(right, text='Relationship list', style='Content.Heading.TLabel')
+        self.selected_portrait = ttk.Label(right, style='Content.TLabel')
+        self.selected_portrait.pack(anchor='w')
         self.heading.pack(fill='x')
         self.empty = wrapping_label(right, style="Content.Muted.TLabel")
         self.empty.pack(fill="x", pady=(6, 0))
         detail_panel = ttk.Frame(right, style="Detail.TFrame", padding=(4, 2))
         detail_panel.pack(fill='x', side='bottom')
         self.detail_panel = detail_panel
-        ttk.Label(detail_panel, text="Selected connection", style="Detail.TLabel").pack(anchor="w")
+        self.selected_heading = ttk.Label(detail_panel, text="Selected connection", style="Detail.TLabel")
+        self.selected_heading.pack(anchor="w")
         self.details = read_only_text_area(detail_panel, height=3)
         self.details.pack(fill='x')
         detail_actions = ActionBar(detail_panel)
@@ -59,6 +78,7 @@ class RelationshipsView(ttk.Frame):
         self.detail_actions = detail_actions
         selected_actions = ttk.Menubutton(detail_actions, text="Selected actions", style="Secondary.TMenubutton", state="disabled")
         menu = tk.Menu(selected_actions, tearoff=False)
+        menu.add_command(label='Read selected connection…', command=self.read_selected)
         menu.add_command(label="Correct entry", command=self.edit_selected)
         menu.add_command(label="History / story change…", command=self.history)
         menu.add_command(label="Consolidate reciprocal…", command=self.consolidate)
@@ -71,6 +91,47 @@ class RelationshipsView(ttk.Frame):
         self.tree.bind("<Double-1>", lambda _: self.edit_selected())
         self.tree.bind('<<TreeviewSelect>>', self.show_details)
         self.refresh()
+        self.bind('<Configure>', self.compact_layout, add='+')
+
+    def compact_layout(self, event=None):
+        if event is not None and event.widget is not self:
+            return
+        compact = self._root().winfo_height() < 620
+        if compact == getattr(self, '_compact', None):
+            return
+        self._compact = compact
+        self.configure(padding=4 if compact else 16)
+        self.title_label.pack_forget()
+        if not compact:
+            self.title_label.pack(anchor='w', before=self.context_label)
+        self.context_label.configure(text='Current · Source → Target; mutual ↔' if compact else 'Current — after the last event\n' + LEGEND)
+        for item in [*self.full_actions, self.compact_menu]:
+            item.grid_forget()
+        self.actions.items = [self.full_actions[0], self.compact_menu] if compact else list(self.full_actions)
+        self.actions.reflow()
+        self.show_details()
+        self.refresh_heading()
+
+    def refresh_heading(self):
+        character = next((row for row in self.database.characters() if row['id'] == self.character_id), None)
+        if character:
+            label = f"{character['name']} (#{character['id']})"
+            self.heading.configure(text=label + ' · connections' if getattr(self, '_compact', False) else f"Connections from {label}'s perspective")
+        else:
+            self.heading.configure(text='All relationships')
+
+    def read_selected(self):
+        if not self.tree.selection():
+            return
+        dialog = tk.Toplevel(self)
+        dialog.title('Selected connection')
+        dialog.geometry('560x360')
+        dialog.transient(self._root())
+        text = read_only_text_area(dialog)
+        text.pack(fill='both', expand=True, padx=12, pady=12)
+        set_read_only_text(text, self.details.get('1.0', 'end-1c'))
+        ttk.Button(dialog, text='Close', command=dialog.destroy).pack(pady=8)
+        dialog.bind('<Escape>', lambda _: dialog.destroy())
 
     def show_undo_notice(self):
         self.undo_button.state(["!disabled"])
@@ -96,8 +157,17 @@ class RelationshipsView(ttk.Frame):
         if character:
             label = f"{character['name']} (#{character['id']})"
             self.heading.configure(text=f"Connections from {label}'s perspective")
+            from .tree_art import portrait_photo
+            self.selected_portrait.image = portrait_photo(self.selected_portrait, self.database, character.get('portrait', ''))
+            self.selected_portrait.configure(image=self.selected_portrait.image or '')
+            if self.selected_portrait.image:
+                self.selected_portrait.pack(anchor='w', before=self.heading)
+            else:
+                self.selected_portrait.pack_forget()
         else:
             self.heading.configure(text="All relationships")
+            self.selected_portrait.pack_forget()
+        self.refresh_heading()
         self.rows = {str(row['id']): row for row in self.database.relationships()
                      if self.character_id is None or self.character_id in (row['source_id'], row['target_id'])}
         self.empty.configure(text='' if self.rows else 'No connections here yet. Add a relationship; you can create missing characters inside the form.')
@@ -135,9 +205,16 @@ class RelationshipsView(ttk.Frame):
         row = self.rows.get(selected[0]) if selected else None
         text = f"{relationship_details(row, self.character_id)}\n{row['notes'] or 'No notes.'}" if row else 'Select a connection to inspect or edit its exact record.'
         set_read_only_text(self.details, text)
+        self.details.pack_forget()
+        self.selected_heading.pack_forget()
+        if not getattr(self, '_compact', False):
+            self.selected_heading.pack(anchor='w', before=self.detail_actions)
+            self.details.pack(fill='x', before=self.detail_actions)
         for button in (self.selected_actions_button, self.delete_button):
             button.state(["!disabled" if row else "disabled"])
-        if row:
+        for index in range(4, 9):
+            self.compact_actions_menu.entryconfigure(index, state='normal' if row else 'disabled')
+        if row and not getattr(self, '_compact', False):
             # Restore it before the expanding table so a later selection cannot
             # leave the panel squeezed to one pixel by pack's order.
             self.detail_panel.pack(fill="x", side="bottom", before=self.tree.master)
