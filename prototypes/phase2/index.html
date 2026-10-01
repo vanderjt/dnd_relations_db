@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Greyhaven — Character Studio</title>
+  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="refinements.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="masthead">
+      <a class="brand" href="#" aria-label="Story Atlas, about this prototype" id="about-brand"><span class="brand-mark">S<span>A</span></span><span>Story Atlas<small>THE CHARACTER STUDIO</small></span></a>
+      <div class="book-title"><span class="book-line"></span> Greyhaven <span class="edition">A STORY IN THREE CHAPTERS</span></div>
+      <button class="quiet" id="about-button">About this demo <span aria-hidden="true">↗</span></button>
+    </header>
+    <aside class="sidebar" aria-label="Cast">
+      <div class="sidebar-heading"><span class="eyebrow">YOUR STORY’S PEOPLE</span><div><h1>The cast</h1><span id="cast-count" class="count"></span></div></div>
+      <label class="search"><span aria-hidden="true">⌕</span><input id="cast-search" type="search" placeholder="Find a character…" aria-label="Search cast by name, role or affiliation"><kbd>/</kbd></label>
+      <div class="cast-caption"><span>CHARACTER</span><span>18 VOICES</span></div>
+      <nav id="cast-list" class="cast-list" aria-label="Choose a character"></nav>
+      <div class="sidebar-foot"><span class="live-dot"></span><span>Phase 02 · Design study<small>A place to develop every character.</small></span></div>
+    </aside>
+    <main class="workspace">
+      <div class="workspace-toolbar">
+        <div><div class="eyebrow">CHARACTER WORKSPACE</div><button id="context-button" class="context-button" title="Read the existing event"><span id="event-context"></span> <span aria-hidden="true">↗</span></button></div>
+        <div class="save-actions"><span id="save-state" role="status"></span><button id="review-button" class="primary" disabled>Review changes <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div class="sheet-scroll" id="sheet-scroll"><div id="sheet" class="sheet"><p>Opening Greyhaven…</p></div></div>
+    </main>
+    <footer class="timeline" aria-label="Story timeline">
+      <div class="timeline-heading"><div><span class="eyebrow">A CHARACTER THROUGH TIME</span><span class="timeline-instruction">Choose an existing event to work on this version.</span></div><div class="timeline-nav"><button id="previous-event" class="square" aria-label="Previous event">←</button><span id="event-position"></span><button id="next-event" class="square" aria-label="Next event">→</button></div></div>
+      <div id="chapter-labels" class="chapter-labels"></div>
+      <div id="timeline-events" class="timeline-events" role="group" aria-label="Existing events"></div>
+    </footer>
+  </div>
+  <dialog id="review-dialog" aria-labelledby="review-title">
+    <form method="dialog" id="review-form">
+      <div class="dialog-header"><span class="eyebrow">SAVE THIS VERSION</span><h2 id="review-title">What continues from here?</h2><p id="review-context"></p></div>
+      <p class="review-explainer">All listed changes will be saved. <strong>Checked changes also carry forward</strong> until the next explicit change to that field. Unchecked changes apply only at this event.</p>
+      <div class="review-tools"><span id="review-count"></span><div><button type="button" id="select-all" class="text-button">Select all</button><span> / </span><button type="button" id="deselect-all" class="text-button">Deselect all</button></div></div>
+      <div id="change-list" class="change-list"></div>
+      <p class="scope-note">At the next event, an event-only change returns to the previously continuing value, unless that event has its own explicit change.</p>
+      <div class="dialog-actions"><button type="button" id="cancel-review" class="secondary">Back to editing</button><button type="submit" class="primary">Save changes <span aria-hidden="true">✓</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="leave-dialog" aria-labelledby="leave-title"><div class="dialog-header"><span class="eyebrow">BEFORE YOU MOVE ON</span><h2 id="leave-title">Keep these changes?</h2><p>Your edits belong to the character and event currently open.</p></div><div class="dialog-actions leave-actions"><button id="stay" class="secondary">Keep editing</button><button id="discard" class="text-button danger">Discard edits</button><button id="leave-review" class="primary">Review changes</button></div></dialog>
+  <dialog id="context-dialog" aria-labelledby="context-title"><div class="dialog-header"><span class="eyebrow" id="context-chapter"></span><h2 id="context-title"></h2><p id="context-description"></p></div><p class="scope-note">This is an existing Greyhaven event. Event creation will live in a separate workspace.</p><div class="dialog-actions"><button class="primary" data-close="context-dialog">Back to character</button></div></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-header"><span class="eyebrow">PHASE 02 · INTERACTIVE PROTOTYPE</span><h2 id="about-title">A new chapter for Story Atlas.</h2><p>A focused place to develop one character at a time, through the events of Greyhaven.</p></div><div class="about-copy"><p><strong>Try it:</strong> choose a character, edit a few fields, then review which changes carry forward. Move along the timeline to see the result.</p><p>Greyhaven supplies all 18 characters, 3 chapters, 10 events and the original relationship history. Character profiles are template starting points, not reconstructed historical profiles. Unspecified ages and statistics stay blank.</p><p>Saved prototype edits stay in this browser only. They do not change a Story Atlas database. Unsubmitted edits prompt before navigation. Use Ctrl/Cmd + S to review changes, or / to find a character.</p><p>This study explores layout and interaction. Portraits, the final visual theme and the event-creation workspace are still open design decisions.</p></div><div class="dialog-actions"><button id="reset-button" class="text-button danger">Reset demo edits…</button><button class="primary" data-close="about-dialog">Explore the studio</button></div></dialog>
+  <dialog id="reset-dialog" aria-labelledby="reset-title"><div class="dialog-header"><h2 id="reset-title">Return to the original template?</h2><p>This removes this prototype’s saved and unsaved edits in this browser. Your real stories are unaffected.</p></div><div class="dialog-actions"><button class="secondary" data-close="reset-dialog">Cancel</button><button id="confirm-reset" class="primary">Reset prototype</button></div></dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="studio.mjs"></script>
+</body>
+</html>

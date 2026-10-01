@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {resolveField,resolveProfile,commitChanges,changesBetween,validRecords} from './model.mjs';
+const base={id:1,name:'Mira',health:'20',inventory:'Sword'};
+const r=(event,value,persist=true,field='health')=>({character:1,event,value,persist,field});
+const value=(records,event,field='health')=>resolveField(base,records,1,field,event).value;
+test('an event-only edit restores the previous continuing value',()=>{const records=[r(2,'18'),r(3,'12',false)];assert.equal(value(records,1),'20');assert.equal(value(records,3),'12');assert.equal(value(records,4),'18');});
+test('editing earlier history preserves a later explicit decision',()=>{const records=[r(5,'15'),r(2,'19')];assert.equal(value(records,4),'19');assert.equal(value(records,5),'15');assert.equal(value(records,10),'15');});
+test('a later local override does not stop an earlier continuing value',()=>{const records=[r(5,'5',false),r(2,'19')];assert.equal(value(records,5),'5');assert.equal(value(records,6),'19');});
+test('save commits every change, with carry-forward selected per field',()=>{const records=commitChanges([r(2,'18')],1,3,[{field:'health',after:'12'},{field:'inventory',after:'Lantern'}],new Set(['inventory']));assert.equal(value(records,3),'12');assert.equal(value(records,4),'18');assert.equal(value(records,4,'inventory'),'Lantern');assert.equal(resolveProfile({...base,id:2},records,4).inventory,'Sword');});
+test('resaving a field replaces its record and can change persistence',()=>{const records=commitChanges([r(3,'12')],1,3,[{field:'health',after:'9'}],new Set());assert.equal(records.length,1);assert.equal(value(records,3),'9');assert.equal(value(records,4),'20');});
+test('review excludes unchanged fields',()=>{const saved=resolveProfile(base,[],1);assert.deepEqual(changesBetween(saved,{...saved}),[]);assert.deepEqual(changesBetween(saved,{...saved,health:'12'}),[{field:'health',before:'20',after:'12'}]);});
+test('stored data is validated and duplicate records normalized',()=>{const input=[r(1,'10'),r(0,'bad'),r(11,'bad'),r(2,4),r(2,'x',true,'unknown'),{...r(2,'x'),character:8},r(1,'11')];assert.deepEqual(validRecords(input,[base],10),[r(1,'11')]);});
