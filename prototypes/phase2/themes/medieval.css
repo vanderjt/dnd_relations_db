@@ -45,3 +45,5 @@
   --hostile-bg: #f6dfdd;
   --hostile-text: #8a302a;
 }
+
+:root{--world-margin-art:url("../ornaments/medieval.svg");}

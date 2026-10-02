@@ -1,7 +1,7 @@
 import {TYPES,pair,equal,label,typed,seedHistory,resolveConnections,commitConnections,validConnectionRecords} from './relationships.mjs?v=6';
 
 export function createConnectionEditor({data,context,name,esc,tone,changed}) {
-  const seed=seedHistory(data);
+  let seed=seedHistory(data);
   let records=[], saved={}, draft={}, removed=new Map(), editing=null;
   const dialog=document.createElement('dialog');dialog.id='connection-dialog';
   dialog.innerHTML=`<form id="connection-form"><div class="dialog-header"><h2 id="connection-title">Add connection</h2><p id="connection-context"></p></div><div class="connection-form-fields"><label class="field">Character<select id="connection-person" required></select></label><label class="field">Relationship<select id="connection-type" required></select></label><p id="connection-preview" aria-live="polite"></p><label class="field">Notes<textarea id="connection-notes" rows="3"></textarea></label><p class="muted">This stages a change. Review changes to save it and choose whether it carries forward.</p></div><div class="dialog-actions"><button type="button" class="secondary" id="connection-cancel">Cancel</button><button class="primary" type="submit">Apply change</button></div></form>`;
@@ -61,7 +61,7 @@ export function createConnectionEditor({data,context,name,esc,tone,changed}) {
   });
   return {
     markup,changes,open,state:()=>draft,removed:()=>[...removed],
-    reset(){const ids=new Set(data.characters.map(c=>c.id));saved=Object.fromEntries(Object.entries(resolveConnections(seed,records,context().event)).filter(([,r])=>ids.has(r.source_id)&&ids.has(r.target_id)));draft=structuredClone(saved);removed.clear();},
+    reset(){seed=seedHistory(data);const ids=new Set(data.characters.map(c=>c.id));saved=Object.fromEntries(Object.entries(resolveConnections(seed,records,context().event)).filter(([,r])=>ids.has(r.source_id)&&ids.has(r.target_id)));draft=structuredClone(saved);removed.clear();},
     load(raw){records=validConnectionRecords(raw,data);},
     records:()=>records,
     commit(carry){records=commitConnections(records,context().event,changes(),carry);},

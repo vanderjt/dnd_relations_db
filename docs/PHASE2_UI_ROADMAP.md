@@ -4,7 +4,7 @@ Agreed during the October 1, 2026 design review. Build small, separately reviewa
 
 ## Minimum frames and navigation
 
-Three main pages: Characters, Relationships, World. Supporting dialogs: New character, Add/Edit connection, and the existing shared Review changes dialog. The Relationships page may use a side panel for its connection editor. Do not put graph controls or world management on the character profile.
+Four main pages: Story, Characters, Relationships, World. Supporting dialogs: New character, Add/Edit connection, and the existing shared Review changes dialog. The Relationships page may use a side panel for its connection editor. Do not put graph controls or world management on the character profile.
 
 - Characters → New character → new profile immediately.
 - Profile → click relationship tag → compact connection editor → shared Review changes.
@@ -36,7 +36,7 @@ First interactive frame implemented for review. Default to the full cast graph a
 
 ## Milestone 4: World page
 
-First interactive frame implemented for review. Reusable named lists for Races/species, Roles, Factions, Locations; name and optional description for each entry. Values saved from profile dropdowns become reusable entries. Languages, Religions/beliefs, and Titles/ranks are included as reference-only lists. Entries can be added and descriptions edited; renaming and deletion remain deferred so existing profile assignments stay consistent. Do not automatically add more profile fields before reviewing placement.
+First interactive frame implemented for review. Reusable named lists for Races/species, Roles, Factions, Locations; name and optional description for each entry. Values saved from profile dropdowns become reusable entries. Languages, Religions/beliefs, and Titles/ranks are included as reference-only lists. Entries can be added, renamed, and described. Renaming updates character baselines and saved assignments throughout the story while retaining event scope. Only entries unused by characters across their history can be deleted. Do not automatically add more profile fields before reviewing placement.
 
 Reserve distinct space for World summary, Lore, Author's notes, and a world map. Map interactions are deferred. The future concept is an image with pins: hover reveals a name; Place pin lets the user click the image and name the location. No region drawing is requested. Linking pins to shared Locations remains deferred.
 
@@ -45,3 +45,13 @@ Reserve distinct space for World summary, Lore, Author's notes, and a world map.
 - Goals as an optional simple list rather than a table, preserving existing prose.
 - Optional personality trait tags alongside free text. Possible later Python classification into generic trait categories for mechanics; low priority, original writing preserved, inferred categories kept distinct from authored facts.
 - No architecture migration, map editor, custom relationship-type designer, or post-save Undo bundled into milestone 1.
+
+## Milestone 5: Story planning
+
+First frame implemented: expandable chapter/event outline, chapter and event creation, chapter summaries, and event title, summary, Planned/Happened status, purpose, shared location, participants, and author notes. Events are flexible in duration. Participants do not change character existence or relationships.
+
+The selected event is shared with Characters and Relationships. Opening a chapter preserves that event; new events become selected immediately. Participant shortcuts open profiles at the selected event. Dirty forms use save/discard/stay navigation. Story edits save directly, without character carry-forward choices.
+
+New chapters append to the outline; new events append within their chapter. Insertion shifts saved profile and connection event indices to preserve existing event identity and seeds original relationship continuity from the preceding event. Event moves within or between chapters now have an impact preview. Saved records are remapped through event IDs, and the preview lists events whose resolved character or connection values change. Chapter reordering now uses the same impact preview, moving its events together in their existing order. Empty chapters can also be moved. Deletion remains deferred. Added chapters/events and planning details persist in browser storage; reset restores the fixture.
+
+Story refinement: full-height themed outline on desktop, independent editor scrolling, story purpose before summary, and prominent chapter headings. Participants use searchable removable tags; clicking a tag opens the profile at the selected event. The relationship shortcut lives beside participants; the separate Work at this event section has been removed.

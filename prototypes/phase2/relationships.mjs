@@ -55,7 +55,7 @@ export function commitConnections(records,event,changes,carry) {
 export function validConnectionRecords(raw,data) {
   if(!Array.isArray(raw))return [];
   const ids=new Set(data.characters.map(c=>c.id));
-  const legacy=new Map(seedHistory(data).filter(r=>r.value).map(r=>[r.key,pair(r.value.source_id,r.value.target_id)]));
+  const legacy=new Map(Object.values(data.relationships).flat().map(r=>['legacy-'+r.id,pair(r.source_id,r.target_id)]));
   const result=new Map();
   for(const r of raw) {
     if(!r||typeof r.key!=='string'||!Number.isInteger(r.event)||r.event<1||r.event>data.events.length||typeof r.persist!=='boolean')continue;

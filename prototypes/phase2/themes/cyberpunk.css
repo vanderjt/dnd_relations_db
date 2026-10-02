@@ -45,3 +45,5 @@
   --hostile-bg: #4c2930;
   --hostile-text: #ffbab7;
 }
+
+:root{--world-margin-art:url("../ornaments/cyberpunk.svg");}
