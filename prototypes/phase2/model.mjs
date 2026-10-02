@@ -2,8 +2,8 @@ export const FIELDS = {
   name: 'Name', species: 'Race / species', role: 'Class / role', age: 'Age',
   status: 'Status', location: 'Location', faction: 'Affiliation',
   health: 'Health', armor: 'Armor', mana: 'Mana', inventory: 'Inventory',
-  summary: 'Character in a sentence', goals: 'Motivation', traits: 'Personality',
-  skills: 'Skills', backstory: 'Lore / story', notes: 'Author’s notes',
+  summary: 'Short Summary', goals: 'Goals', traits: 'Personality',
+  skills: 'Skills', backstory: 'Background', notes: 'Author’s notes',
 };
 
 // An event-only record overlays one point; it never changes the continuing value.

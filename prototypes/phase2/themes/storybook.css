@@ -1,0 +1,47 @@
+/* Theme roles only; component layout lives in studio.css. */
+:root {
+  color-scheme: light;
+  --ink: #26392f;
+  --muted: #657268;
+  --paper: #f5f3eb;
+  --card: #fdfcf7;
+  --line: #dcded2;
+  --sage: #dbe5d6;
+  --accent: #315747;
+  --sidebar: #233d33;
+  --sidebar-text: #f3f2e9;
+  --sidebar-muted: #b7c9bb;
+  --sidebar-line: #6e8374;
+  --sidebar-hover: #ffffff06;
+  --selected-avatar: #c5d3be;
+  --gold: #bca775;
+  --toolbar: #f8f7f0;
+  --portrait: #d3dfca;
+  --portrait-glow: #e2e9d9;
+  --portrait-line: #8fa58e66;
+  --hover: #dce5d43d;
+  --dirty: #faf2d8;
+  --dirty-border: #c5aa66;
+  --badge-text: #6f5933;
+  --badge: #eee4cc;
+  --focus: #af7b32;
+  --danger: #964a38;
+  --shadow: #17271b22;
+  --backdrop: #15261fcc;
+  --on-accent: #ffffff;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-heading: Georgia, serif;
+  --radius: 12px;
+  --control-radius: 6px;
+  --dialog-radius: 15px;
+  --timeline-background: #ecf0e5;
+  --timeline-line: #b9c7b2;
+  --timeline-dot: #edf2e7;
+  --timeline-ring: #cfdbc7;
+  --friendly-bg: #e0efdf;
+  --friendly-text: #244d32;
+  --wary-bg: #f5e7bd;
+  --wary-text: #725018;
+  --hostile-bg: #f6dfdd;
+  --hostile-text: #8a302a;
+}

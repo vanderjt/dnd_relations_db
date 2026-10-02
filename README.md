@@ -3,6 +3,12 @@
 A local storytelling notebook built with Python, Anaconda, Tkinter, SQLite,
 NetworkX, and Matplotlib. No account or server required.
 
+The accepted future UI direction is React and TypeScript hosted in pywebview,
+with Python controlling application logic and authoritative state. See the
+[web UI architecture decision](docs/WEB_UI_ARCHITECTURE_DECISION.md) for the
+alternatives, rationale, offline distribution requirements, and proposed first
+milestone. This is a direction decision; the current application remains Tkinter.
+
 ## Start with Anaconda
 
 Open Anaconda Prompt in this project folder:
