@@ -1,4 +1,4 @@
-export const SUGGESTED_FIELDS = new Set(['species', 'role', 'status', 'location', 'faction']);
+export const SUGGESTED_FIELDS = new Set(['species', 'role', 'status', 'location', 'faction', 'language', 'belief', 'title']);
 export function uniqueOptions(values) {
   const items=new Map();
   for(const value of values) {

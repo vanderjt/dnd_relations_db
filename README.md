@@ -9,6 +9,11 @@ with Python controlling application logic and authoritative state. See the
 alternatives, rationale, offline distribution requirements, and proposed first
 milestone. This is a direction decision; the current application remains Tkinter.
 
+A separate native web preview is now available through **Launch Story Atlas Preview.cmd**.
+See [the preview delivery guide](docs/MVP_DELIVERY.md) for working features, local storage,
+recovery, verification, and remaining distribution limitations. The original launcher
+still opens Tkinter; preview stories use a separate format.
+
 ## Start with Anaconda
 
 Open Anaconda Prompt in this project folder:

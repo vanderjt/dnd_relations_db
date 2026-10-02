@@ -36,7 +36,7 @@ First interactive frame implemented for review. Default to the full cast graph a
 
 ## Milestone 4: World page
 
-First interactive frame implemented for review. Reusable named lists for Races/species, Roles, Factions, Locations; name and optional description for each entry. Values saved from profile dropdowns become reusable entries. Languages, Religions/beliefs, and Titles/ranks are included as reference-only lists. Entries can be added, renamed, and described. Renaming updates character baselines and saved assignments throughout the story while retaining event scope. Only entries unused by characters across their history can be deleted. Do not automatically add more profile fields before reviewing placement.
+First interactive frame implemented for review. Reusable named lists for Races/species, Roles, Factions, Locations; name and optional description for each entry. Values saved from profile dropdowns become reusable entries. Languages, Religions/beliefs, and Titles/ranks feed a collapsed World details section on character profiles. Each currently supports one choice per event, with free entry, shared review, and carry-forward controls. Entries can be added, renamed, and described. Renaming updates character baselines and saved assignments throughout the story while retaining event scope. Only entries unused by characters across their history can be deleted. Do not automatically add more profile fields before reviewing placement.
 
 Reserve distinct space for World summary, Lore, Author's notes, and a world map. Map interactions are deferred. The future concept is an image with pins: hover reveals a name; Place pin lets the user click the image and name the location. No region drawing is requested. Linking pins to shared Locations remains deferred.
 
@@ -55,3 +55,15 @@ The selected event is shared with Characters and Relationships. Opening a chapte
 New chapters append to the outline; new events append within their chapter. Insertion shifts saved profile and connection event indices to preserve existing event identity and seeds original relationship continuity from the preceding event. Event moves within or between chapters now have an impact preview. Saved records are remapped through event IDs, and the preview lists events whose resolved character or connection values change. Chapter reordering now uses the same impact preview, moving its events together in their existing order. Empty chapters can also be moved. Deletion remains deferred. Added chapters/events and planning details persist in browser storage; reset restores the fixture.
 
 Story refinement: full-height themed outline on desktop, independent editor scrolling, story purpose before summary, and prominent chapter headings. Participants use searchable removable tags; clicking a tag opens the profile at the selected event. The relationship shortcut lives beside participants; the separate Work at this event section has been removed.
+
+## Integration handoff
+
+The October 2 repository audit and the next implementation sequence are recorded in [WEB_UI_ARCHITECTURE_DECISION.md](WEB_UI_ARCHITECTURE_DECISION.md#integration-plan-after-the-ui-checkpoint). The first implementation slice is Python-owned character field history and atomic profile persistence on disposable databases, followed by the React/pywebview create/edit/save/reopen workflow. No production migration has been run.
+
+The initial opt-in persistence service and temporary-database acceptance tests are implemented. Dated text fields can now resolve and save atomically with conflict detection; close/reopen and failed-save rollback are covered. World references, production migration/export compatibility, and the UI bridge remain pending. See the architecture document's first persistence slice status for the exact boundary.
+
+## Native preview checkpoint — October 2
+
+The separate React/TypeScript preview now connects to Python/SQLite through pywebview. Native create/edit/save/reopen, dated profile and connection scopes, chapters/events, participants, graph interaction, stable World choices, durable drafts, and SQLite backups/restored copies are implemented and tested. See [MVP_DELIVERY.md](MVP_DELIVERY.md) for the exact launcher and evidence.
+
+The browser prototype remains the approved visual reference and has not been converted into the production persistence layer. Legacy/prototype imports, chronology moves/deletion, destructive World operations, combined profile/connection batches, and clean-machine packaging remain pending. Normal preview files are stored outside the repository in a separately identified format; the Tkinter editor rejects them.

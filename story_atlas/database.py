@@ -24,6 +24,8 @@ class Database:
         self.connection.row_factory = sqlite3.Row
         self.connection.execute("PRAGMA foreign_keys = ON")
         try:
+            if self.connection.execute('PRAGMA application_id').fetchone()[0] == 0x53415056:
+                raise ValueError('This is a Story Atlas Preview story. Open it with Launch Story Atlas Preview; the legacy editor cannot edit this format.')
             migrate(self.connection, self.path, make_backup=migration_backup)
         except Exception:
             self.connection.close()

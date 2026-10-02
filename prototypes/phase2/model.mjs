@@ -1,4 +1,5 @@
 export const FIELDS = {
+  language: 'Language', belief: 'Religion / belief', title: 'Title / rank',
   name: 'Name', species: 'Race / species', role: 'Class / role', age: 'Age',
   status: 'Status', location: 'Location', faction: 'Affiliation',
   health: 'Health', armor: 'Armor', mana: 'Mana', inventory: 'Inventory',

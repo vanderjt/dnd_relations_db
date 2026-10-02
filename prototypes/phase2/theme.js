@@ -5,7 +5,7 @@
   let current = 'storybook';
   try { const stored = localStorage.getItem(key); if (Object.hasOwn(themes, stored)) current = stored; } catch {}
   const apply = name => {
-    document.querySelector('#theme-stylesheet').href = `themes/${name}.css?v=26`;
+    document.querySelector('#theme-stylesheet').href = `themes/${name}.css?v=27`;
     document.documentElement.dataset.theme = name;
   };
   apply(current);

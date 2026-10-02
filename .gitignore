@@ -7,3 +7,5 @@ exports/
 build/
 dist/
 build-verification/
+node_modules/
+preview/dist/
