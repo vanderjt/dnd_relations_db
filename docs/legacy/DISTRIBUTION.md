@@ -16,10 +16,10 @@
 > **More → Saved graph views…** to explore colors and guided scenes.
 
 > Latest release: **0.18.0**, schema **13**, portable format **9**.
-> [Combined legend and worked examples release](docs/reviews/2026-09-24/EXAMPLES_REPORT.md) supersedes the package identities below.
+> [Combined legend and worked examples release](../reviews/2026-09-24/EXAMPLES_REPORT.md) supersedes the package identities below.
 
 > Latest source release: Story Atlas 0.11.0, schema 10, export format 6.
-> See [Simple rework completion report](docs/reviews/2026-09-24/SIMPLE_REWORK_COMPLETION_REPORT.md)
+> See [Simple rework completion report](../reviews/2026-09-24/SIMPLE_REWORK_COMPLETION_REPORT.md)
 > for the replacement package, verification results and limitations. Earlier hashes below are historical.
 
 # Story Atlas for Windows

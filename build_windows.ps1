@@ -18,8 +18,9 @@ if ($LASTEXITCODE -ne 0) { throw "Cannot freeze build identity" }
 & $buildPython -m PyInstaller --noconfirm --clean --distpath $DistPath StoryAtlas.spec
 if ($LASTEXITCODE -ne 0) { throw "Packaging failed" }
 $packagePath = Join-Path $DistPath 'StoryAtlas'
-Copy-Item -LiteralPath 'DISTRIBUTION.md' -Destination (Join-Path $packagePath 'README-Windows.md') -Force
-Copy-Item -LiteralPath 'Launch Story Atlas.cmd' -Destination (Join-Path $packagePath 'Launch Story Atlas.cmd') -Force
+Copy-Item -LiteralPath 'docs/legacy/DISTRIBUTION.md' -Destination (Join-Path $packagePath 'README-Windows.md') -Force
+Set-Content -LiteralPath (Join-Path $packagePath 'Launch Story Atlas.cmd') -Value '@echo off
+"%~dp0StoryAtlas.exe" %*'
 Compress-Archive -LiteralPath $packagePath -DestinationPath 'dist\StoryAtlas-Windows-x64.zip' -Force
 $digest = (Get-FileHash -LiteralPath 'dist\StoryAtlas-Windows-x64.zip' -Algorithm SHA256).Hash
 Set-Content -LiteralPath 'dist\StoryAtlas-Windows-x64.zip.sha256' -Value "$digest  StoryAtlas-Windows-x64.zip"

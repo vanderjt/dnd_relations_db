@@ -16,8 +16,8 @@ if conda_bin.is_dir():
             binaries.append((str(conda_bin / name), '.'))
 datas = [(str(root / 'story_atlas' / 'resources'), 'story_atlas/resources'),
          (str(root / 'story_atlas' / 'build_metadata.json'), 'story_atlas'),
-         (str(root / 'README.md'), 'documentation'),
-         (str(root / 'DISTRIBUTION.md'), 'documentation')]
+         (str(root / 'docs/legacy/README.md'), 'documentation'),
+         (str(root / 'docs/legacy/DISTRIBUTION.md'), 'documentation')]
 for name in ('LICENSE_PYTHON.txt', 'LICENSE.txt'):
     license_file = Path(sys.base_prefix) / name
     if license_file.is_file():

@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0..\.."
 if not exist ".build-env\Scripts\python.exe" (
   echo Preview requires the local Python environment. See docs\MVP_DELIVERY.md.
   pause
@@ -11,5 +11,5 @@ if not exist "preview\dist\index.html" (
   pause
   exit /b 1
 )
-".build-env\Scripts\python.exe" preview_main.py
+".build-env\Scripts\python.exe" preview_main.py %*
 if errorlevel 1 pause

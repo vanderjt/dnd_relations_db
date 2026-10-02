@@ -6,7 +6,7 @@ The local React / TypeScript / pywebview preview is implemented and tested on th
 
 Double-click:
 
-`C:\Users\Jonathan\Documents\dnd_relations_db\Launch Story Atlas Preview.cmd`
+`C:\Users\Jonathan\Documents\dnd_relations_db\Launch Story Atlas.cmd`
 
 No additional setup is needed on this development machine: the pinned host dependencies are installed in `.build-env`, and `preview/dist` contains the built local frontend. The launcher reports missing assets or prerequisites and pauses on an error.
 
