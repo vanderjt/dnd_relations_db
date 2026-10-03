@@ -1,7 +1,8 @@
-"""Windows React/pywebview preview. The Tkinter main.py remains independent."""
+"""Native React/pywebview preview. The Tkinter main.py remains independent."""
 import argparse
 import logging
 import os
+import sys
 from pathlib import Path
 import threading
 
@@ -78,9 +79,15 @@ class PreviewBridge:
                 self._close_dispatching = False
 
 
+def default_preview_home():
+    if sys.platform == 'darwin':
+        return Path.home() / 'Library' / 'Application Support' / 'StoryAtlasPreview'
+    return Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'StoryAtlasPreview'
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--home', type=Path, default=Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'StoryAtlasPreview')
+    parser.add_argument('--home', type=Path, default=default_preview_home())
     parser.add_argument('--story', type=Path)
     parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
@@ -91,7 +98,7 @@ def main():
     try:
         import webview
     except ImportError:
-        raise SystemExit('Preview host missing. Install requirements-preview.txt into .build-env.')
+        raise SystemExit('Preview host missing. Use the launcher for your platform to set up dependencies.')
     worker = PreviewWorker(args.home, root / 'prototypes' / 'phase2' / 'greyhaven.json')
     if args.story:
         result = worker.call('open_story', {'path': str(args.story)})
@@ -104,7 +111,10 @@ def main():
     bridge._window = window
     window.events.closing += bridge._on_closing
     try:
-        webview.start(gui='edgechromium', debug=args.debug)
+        if sys.platform == 'win32':
+            webview.start(gui='edgechromium', debug=args.debug)
+        else:
+            webview.start(debug=args.debug)
     finally:
         worker.close()
 

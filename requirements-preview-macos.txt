@@ -1,0 +1,3 @@
+# pywebview installs its native macOS (PyObjC/WebKit) dependencies automatically.
+# Keep the host version aligned with requirements-preview.txt.
+pywebview==6.1

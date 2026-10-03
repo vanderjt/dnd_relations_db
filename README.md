@@ -21,6 +21,17 @@ For friends, copy the Setup EXE from **installer/** to a flash drive. Setup inst
 
 Stories and backups normally live in `%LOCALAPPDATA%\StoryAtlasPreview`, outside this repository. Legacy stories use a different format; keep them intact.
 
+## Run from a Mac clone
+
+Install Python 3.13 and Node.js LTS, then double-click **Launch Story
+Atlas.command** in the repository's main folder. It creates `.mac-env`, installs
+macOS dependencies, builds the frontend, and opens the app. First setup needs
+internet access; later launches reuse the environment and built assets.
+
+See [Mac launcher instructions](installer/README-MAC.md) for cloning, Terminal
+commands, and troubleshooting. This source launcher has not yet been tested on
+a Mac. The Windows Setup EXE does not run on macOS.
+
 ## Where things live
 
 Ready-made [Frankenstein, Dracula, and Edgerunners examples](examples/saved-stories/README.md)

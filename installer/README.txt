@@ -1,5 +1,8 @@
 STORY ATLAS PREVIEW 0.1.0 — WINDOWS OFFLINE INSTALLER
 
+Mac users: see README-MAC.md in this folder. Use Launch Story Atlas.command
+in the repository's main folder; this Windows Setup EXE does not run on macOS.
+
 Installing from this Git repository
 1. Use a Windows 10/11 x64 PC. Install Git and Git LFS if needed:
      Git: https://git-scm.com/downloads/win

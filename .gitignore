@@ -4,6 +4,7 @@ __pycache__/
 data/
 exports/
 .build-env/
+.mac-env/
 build/
 dist/
 build-verification/
