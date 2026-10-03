@@ -8,6 +8,8 @@ import hashlib
 import json
 import sqlite3
 import uuid
+import base64
+import binascii
 
 from .profile_history import FIELDS, SCOPES, resolve_profile
 from .relationship_semantics import normalize, check_duplicate
@@ -180,7 +182,7 @@ class PreviewStore:
         context = self.preference('context') or {}
         event_id = event_id or context.get('event_id') or events[0]['id']
         self.exists('story_events', event_id)
-        cast = [dict(id=row['id'], **self.profile(row['id'], event_id)['values'])
+        cast = [dict(id=row['id'], portrait=self.preference(f"portrait:{row['id']}") or '', **self.profile(row['id'], event_id)['values'])
                 for row in self.rows('SELECT id FROM characters ORDER BY id')]
         return dict(**dict(self.connection.execute('SELECT * FROM metadata').fetchone()), path=str(self.path),
                     chapters=self.rows('SELECT * FROM chapters ORDER BY sequence'), events=events,
@@ -233,12 +235,14 @@ class PreviewStore:
                 raise Conflict('The story changed since this editor opened. Your draft is kept. Reload saved values, then review your pending edits before retrying.')
             handlers = {'create_character': self._create_character, 'save_profile': self._save_profile,
                         'save_event': self._save_event, 'save_chapter': self._save_chapter, 'save_title': self._save_title,
-                        'save_connection': self._save_connection, 'save_world': self._save_world}
+                        'save_connection': self._save_connection, 'save_world': self._save_world,
+                        'save_portrait': self._save_portrait}
             if command not in handlers:
                 raise ValueError('This preview command is unavailable.')
             data = handlers[command](payload)
             self.connection.execute('UPDATE metadata SET revision=revision+1')
-            self.connection.execute('INSERT INTO activity(action,details) VALUES(?,?)', (command, encoded(payload)))
+            audit = {'character_id': payload['character_id'], 'has_portrait': bool(payload['image'])} if command == 'save_portrait' else payload
+            self.connection.execute('INSERT INTO activity(action,details) VALUES(?,?)', (command, encoded(audit)))
             if draft_key:
                 # Only the matching editor can clear its own draft.
                 expected_key = self.draft_key(command, payload)
@@ -259,6 +263,25 @@ class PreviewStore:
         if command == 'save_connection':
             return f"connection:{payload.get('id', 'new')}:{payload['event_id']}"
         return f"{command}:{payload.get('id', 'new')}"
+
+    def _save_portrait(self, p):
+        self.exists('characters', p.get('character_id'))
+        image = p.get('image')
+        if not isinstance(image, str) or len(image) > 2800000:
+            raise ValueError('Choose a portrait image under 2 MB after resizing.')
+        if image:
+            prefix = 'data:image/jpeg;base64,'
+            if not image.startswith(prefix):
+                raise ValueError('Portraits must be converted to JPEG before saving.')
+            try:
+                raw = base64.b64decode(image[len(prefix):], validate=True)
+            except (ValueError, binascii.Error):
+                raise ValueError('Invalid portrait image.') from None
+            if len(raw) > 2000000 or not raw.startswith(b'\xff\xd8\xff') or not raw.endswith(b'\xff\xd9'):
+                raise ValueError('Invalid or oversized portrait image.')
+        key = f"portrait:{p['character_id']}"
+        self.connection.execute('INSERT INTO preferences VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload', (key, encoded(image)))
+        return {'character_id': p['character_id']}
 
     def _create_character(self, p):
         name = text(p.get('name'), 'a character name', True)

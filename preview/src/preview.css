@@ -707,3 +707,43 @@ dialog .connection-form-fields {
   .preview-app .outline-event { flex-wrap:wrap; }
   .preview-app .story-detail { padding:22px; }
 }
+
+/* Shared category colors for relationship lines, arrows, labels and legend. */
+:root {
+  --relationship-support: #267447;
+  --relationship-conflict: #b43b44;
+  --relationship-personal: #8053b0;
+  --relationship-other: #286ba3;
+  --relationship-unclassified: #64717b;
+}
+:root:is([data-theme="gothic"], [data-theme="noir"], [data-theme="cyberpunk"]) {
+  --relationship-support: #83cea1;
+  --relationship-conflict: #f18b94;
+  --relationship-personal: #c6a2ef;
+  --relationship-other: #85bce9;
+  --relationship-unclassified: #abb5bf;
+}
+[data-category="Support"] { --relationship-color: var(--relationship-support); }
+[data-category="Conflict"] { --relationship-color: var(--relationship-conflict); }
+[data-category="Personal"] { --relationship-color: var(--relationship-color-personal, var(--relationship-personal)); }
+[data-category="Other"] { --relationship-color: var(--relationship-other); }
+[data-category="Unclassified"] { --relationship-color: var(--relationship-unclassified); }
+.preview-app .relationship-kind[data-category] {
+  color: var(--relationship-color);
+  border-color: var(--relationship-color);
+  background: var(--paper);
+}
+.relationship-legend { display:flex; flex-wrap:wrap; gap:8px 18px; padding:10px 14px; border-top:1px solid var(--line); font-size:12px; }
+.relationship-legend span { display:inline-flex; align-items:center; gap:7px; color:var(--ink); }
+.relationship-legend i { width:20px; border-top:3px solid var(--relationship-color); }
+
+/* Portraits are embedded in the story, shared across event views. */
+.preview-app .portrait-editor { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.preview-app .portrait-editor .portrait { width: 100%; position: relative; }
+.preview-app .character-photo { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
+.preview-app .portrait .character-photo { position: absolute; inset: 0; z-index: 1; }
+.preview-app .avatar, .preview-app .inspector-portrait { overflow: hidden; }
+.preview-app .portrait-upload { position: relative; text-align: center; cursor: pointer; padding: 8px; border: 1px solid var(--border); border-radius: 5px; }
+.preview-app .portrait-upload input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.preview-app .portrait-upload:focus-within { outline: 2px solid currentColor; outline-offset: 2px; }
+.preview-app .portrait-editor small { font-size: 11px; line-height: 1.5; }

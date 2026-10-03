@@ -30,7 +30,9 @@ class PreviewBridge:
                 directory = self._worker.home.resolve() / ('backups' if name == 'restore' else 'stories')
                 paths = self._window.create_file_dialog(webview.FileDialog.OPEN, allow_multiple=False,
                     directory=str(directory if directory.is_dir() else Path.home()),
-                    file_types=('Story Atlas Preview (*.atlas-preview)',))
+                    # pywebview 6.1 rejects hyphenated extensions in filters.
+                    # Keep existing filenames; PreviewStore validates the format.
+                    file_types=('Story files (*.*)',))
                 if not paths:
                     return {'ok': True, 'data': None}
                 return self._worker.call(name, {'path': paths[0]})

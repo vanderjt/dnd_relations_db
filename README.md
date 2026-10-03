@@ -14,6 +14,9 @@ Stories and backups normally live in `%LOCALAPPDATA%\StoryAtlasPreview`, outside
 
 ## Where things live
 
+Ready-made [Frankenstein, Dracula, and Edgerunners examples](examples/saved-stories/README.md)
+live in `examples/saved-stories`. Open them with the normal story file picker.
+
 | Location | Purpose |
 | --- | --- |
 | `preview/` | Current React UI and frontend build |

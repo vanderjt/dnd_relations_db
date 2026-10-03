@@ -1,5 +1,9 @@
 # Try the Story Atlas examples
 
+**Current app:** open the `.atlas-preview` files in [saved-stories](saved-stories/README.md).
+Frankenstein and Dracula are ready to open through the ordinary file picker.
+The remainder of this guide describes the older Tkinter examples and `.db` format.
+
 In Story Atlas 0.14.0 or later, choose **Story → Try the modern prometheus…** or
 **Story → Try expanded Greyhaven sample…**. The welcome screen offers both too.
 Each action creates a fresh, separate story, so experimentation never overwrites

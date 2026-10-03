@@ -1,0 +1,322 @@
+{
+  "note": "Web-sourced reference portraits. Not a grant of redistribution rights. Frankenstein images are AI interpretations, not canonical likenesses. Safie’s father has no matching portrait in the chosen set and retains his existing placeholder.",
+  "portraits": [
+    {
+      "name": "The creature",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FThe_Creature-1771547546860.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\1de98ecb1b9907b2.jpg",
+      "sha256": "de2138ea233f8518d8104c26bdbdfca9e31d4653516acbaba6f4daef14ba90c5"
+    },
+    {
+      "name": "Elizabeth Lavenza",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FElizabeth_Lavenza-1771547621574.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\9d4813c0afe417cc.jpg",
+      "sha256": "d34093e5c9dbdaa45b9a39e5d62faf1b6366ea17cfc62d048215f7e4cbe70cfb"
+    },
+    {
+      "name": "William Frankenstein",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FWilliam_Frankenstein-1771547757023.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\ecb4f38b3f9ea020.jpg",
+      "sha256": "6cf2b34d6b8ba6208fd3449de9a8d6d77953503db7e0ae537866ab887da6b2ac"
+    },
+    {
+      "name": "Margaret Saville",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FMargaret_Saville-1771553832981.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\1296c563745690a5.jpg",
+      "sha256": "027e2965a35dc0057b7c0feaaea18e243228cf67e2ff405082c7ecaabbece593"
+    },
+    {
+      "name": "Robert Walton",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FRobert_Walton-1771547585121.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\24ddd04a6d3c3a8c.jpg",
+      "sha256": "1e21f12544bd6c9fa312aef2a6251a0927c0451e7a8cfc85dd42a8ac2163c2b8"
+    },
+    {
+      "name": "Alphonse Frankenstein",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FAlphonse_Frankenstein-1771547686557.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\79fe78853ce9d0be.jpg",
+      "sha256": "99997fa5bc12349435f84069b0794893b6e680cb5a1594b1cf1ffa58eec01e8b"
+    },
+    {
+      "name": "M. Waldman",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FM._Waldman-1771553889727.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\3e0f82a32ec1ec8e.jpg",
+      "sha256": "ef34b7ed23188575fe8c13038d583e5f218a5ae05315a6bbf5a5dd3574b076fa"
+    },
+    {
+      "name": "Victor Frankenstein",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FVictor_Frankenstein-1771547515932.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\1225aae7644132de.jpg",
+      "sha256": "65db6ab5ca569f5db36aeb13abb0b31ffc9576d8291b7c62d13e534a2d2618f4"
+    },
+    {
+      "name": "Agatha De Lacey",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FAgatha_De_Lacey-1771547952579.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\27208471e956381f.jpg",
+      "sha256": "99d32b14315537b289604ab30f3495ba6ec16e2fc5f4629f639959aad8aa0399"
+    },
+    {
+      "name": "Justine Moritz",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FJustine_Moritz-1771547832480.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\ef933354917254d9.jpg",
+      "sha256": "e382ea728f41b963184a556c8b2ec3c80bb1c6531d6537a51dbce167193394ef"
+    },
+    {
+      "name": "Safie",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FSafie-1771547984788.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\f754ed2a891b2515.jpg",
+      "sha256": "664293544798726cc3bf965e4ad7dc7b192bc8da477f943218c2b367f72ec446"
+    },
+    {
+      "name": "Ernest Frankenstein",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FErnest_Frankenstein-1771547798144.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\3ebe3b011035e3a4.jpg",
+      "sha256": "d15ac9975e8693286f3820859fd7b7773c3f41446e1f7c829bad21262a91db5d"
+    },
+    {
+      "name": "Henry Clerval",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FHenry_Clerval-1771547654776.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\0165084cf06e4527.jpg",
+      "sha256": "dc8011e20c84cb7d167a0e1f614cd76b9f913aab7f7b723db85722bf8efd22c9"
+    },
+    {
+      "name": "De Lacey",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FDe_Lacey-1771547874680.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\572cbb00a6560524.jpg",
+      "sha256": "7fea771acd0ddcc6c5aacec428c25b96c4da7861cd1443c08710386484fd9291"
+    },
+    {
+      "name": "Caroline Beaufort Frankenstein",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FCaroline_Beaufort_Frankenstein-1771547718990.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\b9ad9476609d55d7.jpg",
+      "sha256": "dbccb4ed3ffa18a2314b3cb2f9f9fc4e21f38617b2866e5bab685c99006bcf4f"
+    },
+    {
+      "name": "Felix De Lacey",
+      "url": "https://storage.googleapis.com/reading-genie-b623d.appspot.com/books%2Ffrankenstein%2FCharacters%2FFelix_De_Lacey-1771547911257.png",
+      "story": "Frankenstein",
+      "source": "https://book2.life/books/frankenstein",
+      "style": "AI-generated period character portrait, published by Book2Life",
+      "cache": "build\\portrait-downloads\\fcd1f871a650d3a2.jpg",
+      "sha256": "274bd88259946b380b299be22368441d854a8deab035b60ab35b0e652ad89242"
+    },
+    {
+      "slug": "gloria-martinez",
+      "name": "Gloria Martinez",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/gloria-martinez-209369.jpg?itok=hSCLuPBl",
+      "source": "https://nekoteka.com/personage/gloria-martinez",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\4c8b8aa8bd2b774c.jpg",
+      "sha256": "20e8c781ec28675f87ee1153911ab3f32cda26a3d404218ab618306c03bf4674"
+    },
+    {
+      "slug": "maine",
+      "name": "Maine",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/maine-209369.jpg?itok=NYgdfup7",
+      "source": "https://nekoteka.com/personage/maine",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\9e4a5a372b940d10.jpg",
+      "sha256": "7cd22b45712462accfbeb1bae6d73656164f1935cbf6a89b6de0cf565e1f5353"
+    },
+    {
+      "slug": "pilar",
+      "name": "Pilar",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/pilar-209369.jpg?itok=13DKJx-H",
+      "source": "https://nekoteka.com/personage/pilar",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\41601bb3cb1a2df1.jpg",
+      "sha256": "c7cc6f366ce40b31b9c4738e9715238423f022af77bc34920848fa5b3e4bc6b4"
+    },
+    {
+      "slug": "faraday",
+      "name": "Faraday",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/faraday-209369.jpg?itok=xdhcoJ19",
+      "source": "https://nekoteka.com/personage/faraday",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\633b433014652e9f.jpg",
+      "sha256": "a885cd68fad6b6c6161d38e5c39189239a9a6b607862cc70c4da4ba399ab8a31"
+    },
+    {
+      "slug": "katsuo-tanaka",
+      "name": "Katsuo Tanaka",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/katsuo-tanaka-209369.jpg?itok=HBhxSuPt",
+      "source": "https://nekoteka.com/personage/katsuo-tanaka",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\f68ed6eacc98f3b3.jpg",
+      "sha256": "25942fd76de0351b969b3eff69b8c845164f618be2a894f1f80258b8376007c3"
+    },
+    {
+      "slug": "jimmy-kurosaki",
+      "name": "Jimmy Kurosaki",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/jimmy-kurosaki-209369.jpg?itok=GA92-FXc",
+      "source": "https://nekoteka.com/personage/jimmy-kurosaki",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\338a51afceef36dc.jpg",
+      "sha256": "327e1c1de34310f128eb74e06a8a30a4897e21d3420409463ce989e7984a6984"
+    },
+    {
+      "slug": "adam-smasher",
+      "name": "Adam Smasher",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/adam-smasher-209369.jpg?itok=zrZY3SHa",
+      "source": "https://nekoteka.com/personage/adam-smasher",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\a94e2fd869f41f9f.jpg",
+      "sha256": "d1324d49673e5535a0c11c9c260f05bc8e1d517ed8c7ada9be276a8453b10c62"
+    },
+    {
+      "slug": "yumiko-3",
+      "name": "Yumiko",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/yumiko-209369.jpg?itok=balSgkzW",
+      "source": "https://nekoteka.com/personage/yumiko-3",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\53b0f0de0b459ac7.jpg",
+      "sha256": "2700c883228d12d879861043f3c949c702bb2c31608264f9696fef91827ba963"
+    },
+    {
+      "slug": "lucy-3",
+      "name": "Lucy (Lucyna Kushinada)",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/lucy-209369.jpg?itok=YCAvV3gY",
+      "source": "https://nekoteka.com/personage/lucy-3",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\9c493fda0ff76b84.jpg",
+      "sha256": "6a6fba96a24d2f0fe0113e1e2a2649377945b278abd31f0b80143ab1e6e6e10b"
+    },
+    {
+      "slug": "david-martinez",
+      "name": "David Martinez",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/david-martinez-209369.jpg?itok=qUaI2O9r",
+      "source": "https://nekoteka.com/personage/david-martinez",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\6c1b59063b27de02.jpg",
+      "sha256": "64d07ed107792423976f72d0b0a35158ef5e2b85005425cfcb0ad2d5620d8acb"
+    },
+    {
+      "slug": "kiwi-1",
+      "name": "Kiwi",
+      "url": "https://nekoteka.com/sites/default/files/styles/420x580/public/poster_personage/kiwi-209369.jpg?itok=UdaLZdQq",
+      "source": "https://nekoteka.com/personage/kiwi-1",
+      "story": "Cyberpunk Edgerunners S1",
+      "style": "Cyberpunk: Edgerunners anime character image; CD PROJEKT RED / TRIGGER, via NekoTeka",
+      "cache": "build\\portrait-downloads\\1d554b14ab299bc1.jpg",
+      "sha256": "3c62d242994a8b9619a83c9cb391e502a8151113c67ac8b18aaacc08f4fe9799"
+    },
+    {
+      "name": "Maxim Kuznetsov",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/c/c2/Maxim_Kuznetsov_Infobox_CPEDGE.png/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Maxim_Kuznetsov_Infobox_CPEDGE.png",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\d3b63d26516de8cb.jpg",
+      "sha256": "81ec61f92b920cdde6f138fd7e0a633e93ce1015743582f4b05c2223cbb4d14e"
+    },
+    {
+      "name": "Tanaka",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/2/23/Tanaka_Infobox_CPEDGE.png/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Tanaka_Infobox_CPEDGE.png",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\6ea9db1324ca079a.jpg",
+      "sha256": "68a3facda974146b2ab749e92201ab68e184452e7b366ad280fd7365d750e475"
+    },
+    {
+      "name": "Rebecca",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/1/19/Rebecca_Infobox_CPEDGE.png/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Rebecca_Infobox_CPEDGE.png",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\ccd59f3a7aab0e4d.jpg",
+      "sha256": "a12a207e5918028fa9031366cdaca9be4ff2ab1fd0608138f92e9fda6945af28"
+    },
+    {
+      "name": "Falco",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/6/6d/Falco_Infobox_CPEDGE.jpg/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Falco_Infobox_CPEDGE.jpg",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\4cf5e334e5eabba4.jpg",
+      "sha256": "bfa1d6a8a8d4c1e7b65b5f6c1d7bc4f9fb4628a4831c3cfce262b69c7d3b5827"
+    },
+    {
+      "name": "Doc",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/5/5c/Doc_Infobox_CPEDGE.png/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Doc_Infobox_CPEDGE.png",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\5a61190df8454d0a.jpg",
+      "sha256": "5694736fb2b621d89139c36421073572ee84e422d0d54ae49a9e07ced463db03"
+    },
+    {
+      "name": "Julio",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://static.wikia.nocookie.net/cyberpunk/images/b/bf/Julio_Infobox_CPEDGE.png/revision/latest",
+      "source": "https://cyberpunk.fandom.com/wiki/File:Julio_Infobox_CPEDGE.png",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Cyberpunk Wiki",
+      "cache": "build\\portrait-downloads\\83d3183fdc3d7299.jpg",
+      "sha256": "07088b2642183e1dc3efbde81365aa3083c83c0ed75381bbc2b057b8fb93315b"
+    },
+    {
+      "name": "Dorio",
+      "story": "Cyberpunk Edgerunners S1",
+      "url": "https://cdn.myanimelist.net/images/characters/5/487857.webp?s=3d26ae0348d576aeb229af71bce3690e",
+      "source": "https://www.anime.com/characters/dorio-1",
+      "style": "Cyberpunk: Edgerunners anime still; CD PROJEKT RED / TRIGGER, via Anime.com / MyAnimeList",
+      "cache": "build\\portrait-downloads\\13dd8213eff3dc8b.jpg",
+      "sha256": "86b52f098c8d7c00b3404fcf4e2159ea5f7f871418cafa354ea3a47ea6bbf74d"
+    }
+  ]
+}

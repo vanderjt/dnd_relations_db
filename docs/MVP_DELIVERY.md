@@ -25,7 +25,7 @@ Node is needed to build, not to run the built preview. Tested runtime: Python 3.
 
 ## What works
 
-- New story with an initial chapter and event; Open preview story; a separate Greyhaven sample; reopening the last story. Story filenames contain the initial title plus a unique suffix. Renaming a story changes its displayed title, not its filename.
+- New story with an initial chapter and event; Open story; a separate Greyhaven sample; reopening the last story. Story filenames contain the initial title plus a unique suffix. Renaming a story changes its displayed title, not its filename.
 - Chapter creation and title/summary editing; event creation within a chapter; event title, Planned/Happened/Unclassified status, purpose, summary, location, notes, and searchable removable participant tags. Selection alone never changes event status. Participant profile navigation has a return action.
 - Character creation and the approved profile sections. Each changed field is reviewed as event-only or carry-forward. Python returns canonical values and named source events. Explicit blanks clear fields; later authored decisions remain authoritative.
 - Directional and mutual connections, inverse perspectives, notes, event-only/carry-forward review, and later-state preservation. New duplicate pairs are rejected. All 50 Greyhaven connection records and their snapshot transitions are preserved, including existing multiple connections between a pair and directional legacy labels.
@@ -53,7 +53,7 @@ Normal launch stores files outside the repository:
 - Backups: `%LOCALAPPDATA%\StoryAtlasPreview\backups`
 - Last-story preference: `%LOCALAPPDATA%\StoryAtlasPreview\settings.json`
 
-The **Story file** menu shows the current story's full path. **New / open… → Open preview story…** opens the stories folder. A missing last-story path shows an error and leaves new/open/restore choices available. Canceling a picker creates nothing.
+The **Story file** menu shows the current story's full path. **New / open… → Open story…** opens the stories folder. A missing last-story path shows an error and leaves new/open/restore choices available. Canceling a picker creates nothing.
 
 To restore, choose **Story file → Restore backup as a copy…** and select a backup. This is available from the welcome screen too. A new `restored-…atlas-preview` file is created in the stories folder; the source and existing story are preserved. To inspect a backup without editing the backup itself, use Restore rather than Open.
 

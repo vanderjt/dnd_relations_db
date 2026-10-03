@@ -8,8 +8,12 @@ $signature = Get-AuthenticodeSignature -LiteralPath $runtime
 if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notlike '*Microsoft Corporation*') { throw 'A valid Microsoft-signed offline WebView2 installer is required.' }
 Push-Location preview
 try { npm.cmd run build; if ($LASTEXITCODE) { throw 'Frontend build failed' } } finally { Pop-Location }
-& $python -m unittest tests.test_preview_close tests.test_preview_store tests.test_profile_history -q
+& $python -m unittest tests.test_preview_portrait tests.test_preview_picker tests.test_preview_close tests.test_preview_store tests.test_profile_history -q
 if ($LASTEXITCODE) { throw 'Tests failed' }
+& $python tools/verify_literary_examples.py
+if ($LASTEXITCODE) { throw 'Literary example verification failed' }
+& $python tools/build_edgerunners_example.py 'examples/saved-stories/Cyberpunk Edgerunners S1.atlas-preview' --verify-only
+if ($LASTEXITCODE) { throw 'Edgerunners example verification failed' }
 $env:PYINSTALLER_CONFIG_DIR = Join-Path $PSScriptRoot 'build\pyinstaller-preview-cache'
 & $python -m PyInstaller --noconfirm --distpath dist --workpath build/preview-freeze StoryAtlasPreview.spec
 if ($LASTEXITCODE) { throw 'Application packaging failed' }

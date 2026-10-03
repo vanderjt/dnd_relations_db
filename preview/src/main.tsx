@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./preview.css";
-import { Graph, relationshipLabel } from "./Graph";
+import { Graph, relationshipLabel, relationshipCategory } from "./Graph";
 import { World, worldLabels } from "./World";
 
 type Data = Record<string, any>;
@@ -100,6 +100,11 @@ function App() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [draftState, setDraftState] = useState("");
+  useEffect(() => {
+    if (notice !== "Story opened.") return;
+    const timer = window.setTimeout(() => setNotice(""), 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
   const [review, setReview] = useState(false),
     [closeRequested, setCloseRequested] = useState(false),
     [collapsedChapters, setCollapsedChapters] = useState<number[]>([]),
@@ -313,6 +318,42 @@ function App() {
           collapsedChapters,worldDetails:!!document.querySelector<HTMLDetailsElement>(".profile-world-details")?.open}}});
     }
     await api("close");
+  }
+  async function savePortrait(file?: File) {
+    const target = character;
+    let image = "";
+    if (file) {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 20 * 1024 * 1024)
+        throw new Error('Choose a JPG, PNG, or WebP image under 20 MB.');
+      const url = URL.createObjectURL(file);
+      try {
+        const photo = new Image();
+        photo.src = url;
+        await photo.decode();
+        const scale = Math.min(1, 768 / Math.max(photo.naturalWidth, photo.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = '#eee';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(photo, 0, 0, canvas.width, canvas.height);
+        image = canvas.toDataURL('image/jpeg', 0.88);
+      } finally { URL.revokeObjectURL(url); }
+    }
+    await flush();
+    const result = await api('write', {command:'save_portrait', payload:{character_id:target,image},
+      expected_revision:editRef.current?.revision ?? workspace!.revision, request_id:crypto.randomUUID()});
+    setWorkspace((w) => w ? ({...w, revision:result.revision,
+      characters:w.characters.map((c: Data) => c.id === target ? {...c,portrait:image} : c)}) : w);
+    // Keep unsaved profile text and its draft while advancing this editor's revision.
+    if (editRef.current) {
+      const next = {...editRef.current, revision:result.revision};
+      editRef.current = next;
+      setEditor(next);
+      persist(next);
+    }
+    setNotice(image ? 'Portrait saved with this story.' : 'Portrait removed.');
   }
   async function save() {
     const e = editRef.current;
@@ -797,7 +838,7 @@ function App() {
                   className="secondary"
                   onClick={() => void run(() => openStory("open_story"))}
                 >
-                  Open preview story…
+                  Open story…
                 </button>
                 <button
                   className="secondary"
@@ -857,7 +898,7 @@ function App() {
                             navigate(() => refresh("characters", eventId, c.id))
                           }
                         >
-                          <span className="avatar">{initials(c.name)}</span>
+                          <span className="avatar">{c.portrait ? <img className="character-photo" src={c.portrait} alt="" /> : initials(c.name)}</span>
                           <span>
                             <strong className="cast-name">{c.name}</strong>
                             <small className="cast-role">
@@ -1002,13 +1043,24 @@ function App() {
                             <span>Click a field to edit</span>
                           </div>
                           <section className="hero">
+                            <div className="portrait-editor">
                             <div className="portrait">
+                              {selectedCharacter?.portrait ? <img className="character-photo" src={selectedCharacter.portrait} alt={`Portrait of ${selectedCharacter.name}`} /> : <>
                               <span className="portrait-initials">
                                 {initials(selectedCharacter?.name || "")}
                               </span>
                               <small className="portrait-caption">
-                                PORTRAIT TO COME
-                              </small>
+                                ADD A PORTRAIT
+                              </small></>}
+                            </div>
+                            <label className="portrait-upload secondary">
+                              {selectedCharacter?.portrait ? 'Change photo' : 'Upload photo'}
+                              <input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy}
+                                aria-label="Upload character portrait"
+                                onChange={e => { const file=e.target.files?.[0]; e.target.value=''; if(file) run(() => savePortrait(file)); }} />
+                            </label>
+                            {selectedCharacter?.portrait && <button type="button" className="secondary" disabled={busy} onClick={() => run(() => savePortrait())}>Remove photo</button>}
+                            <small>Saved for this character at every event.</small>
                             </div>
                             <div className="identity">
                               <div className="identity-top">
@@ -1118,6 +1170,8 @@ function App() {
                                         <td>
                                           <button
                                             className="relationship-kind"
+                                            data-category={relationshipCategory(r)}
+                                            title={relationshipCategory(r)}
                                             onClick={() =>
                                               navigate(() => editConnection(r))
                                             }

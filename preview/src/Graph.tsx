@@ -1,5 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 type Data = Record<string, any>;
+const categories = ["Support", "Conflict", "Personal", "Other", "Unclassified"];
+// Older Greyhaven files store types but no category. This display fallback does
+// not rewrite saved facts; an explicitly chosen category always takes priority.
+const legacyCategories: Record<string, string> = Object.fromEntries(
+  Object.entries({
+    Support: ["Ally", "Mentor", "Colleague", "Research partner", "Political ally", "Protector", "Rescuer", "Patron", "Volunteer", "Donor"],
+    Conflict: ["Rival", "Enemy", "Distrust", "Blackmailer", "Captor"],
+    Personal: ["Friend", "Family"],
+    Other: ["Employer", "Supplier", "Witness", "Commander", "Creditor", "Business partner", "Coworker", "Courier", "Investigator", "Reporter", "Navigator", "Negotiator"],
+  }).flatMap(([category, types]) => types.map(type => [type.toLowerCase(), category])),
+);
+export const relationshipCategory = (r: Data): string =>
+  categories.includes(r.category) ? r.category
+    : !r.category ? legacyCategories[String(r.kind).trim().toLowerCase()] || "Unclassified"
+    : "Unclassified";
+const categoryColor = (r: Data) => `var(--relationship-${relationshipCategory(r).toLowerCase()})`;
+
 type Point = { x: number; y: number };
 export function relationshipLabel(r: Data, id: number) {
   return r.semantics === "mutual" || r.source_id === id
@@ -198,8 +215,9 @@ export function Graph({
             style={{ touchAction: "none" }}
           >
             <defs>
-              <marker
-                id="arrow"
+              {categories.map(category => <marker
+                key={category}
+                id={`arrow-${category}`}
                 viewBox="0 0 10 10"
                 refX="9"
                 refY="5"
@@ -207,8 +225,8 @@ export function Graph({
                 markerHeight="7"
                 orient="auto"
               >
-                <path d="M0 0 L10 5 L0 10z" fill="var(--muted)" />
-              </marker>
+                <path d="M0 0 L10 5 L0 10z" fill={`var(--relationship-${category.toLowerCase()})`} />
+              </marker>)}
             </defs>
             <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
               {edges.map((r: Data) => {
@@ -232,6 +250,7 @@ export function Graph({
                     key={r.id}
                     data-edge="true"
                     className="graph-edge"
+                    data-category={relationshipCategory(r)}
                     role="button"
                     tabIndex={0}
                     aria-label={`Edit ${name(r.source_id)} ${r.kind} ${name(r.target_id)}`}
@@ -254,11 +273,11 @@ export function Graph({
                     <path
                       d={d}
                       fill="none"
-                      stroke="var(--muted)"
-                      strokeWidth="1.5"
+                      stroke={categoryColor(r)}
+                      strokeWidth="2"
                       markerEnd={
                         r.semantics === "directional"
-                          ? "url(#arrow)"
+                          ? `url(#arrow-${relationshipCategory(r)})`
                           : undefined
                       }
                     />
@@ -344,6 +363,11 @@ export function Graph({
             </g>
           </svg>
         </div>
+        <div className="relationship-legend" aria-label="Relationship colors">
+          {categories.map(category => <span key={category} data-category={category}>
+            <i aria-hidden="true" />{category}
+          </span>)}
+        </div>
         <div className="graph-caption">
           {shown.length} characters · {edges.length} connections{" "}
           <span>
@@ -354,7 +378,7 @@ export function Graph({
       <aside className="graph-inspector">
         <div className="graph-inspector-heading">
           <div className="inspector-identity">
-            <div className="inspector-portrait" aria-label="Portrait placeholder">{person?.name?.split(/\s+/).slice(0,2).map((s:string)=>s[0]).join("")}</div>
+            <div className="inspector-portrait">{person?.portrait ? <img className="character-photo" src={person.portrait} alt={`Portrait of ${person.name}`} /> : person?.name?.split(/\s+/).slice(0,2).map((s:string)=>s[0]).join("")}</div>
             <div><h2>{person?.name || "Your cast"}</h2>
               <dl><dt>Age</dt><dd>{person?.age || "Not set"}</dd><dt>Race</dt><dd>{person?.species || "Not set"}</dd><dt>Role</dt><dd>{person?.role || "Not set"}</dd></dl>
             </div>
@@ -373,7 +397,7 @@ export function Graph({
               >
                 {name(r.source_id === selected ? r.target_id : r.source_id)}
               </button>
-              <button className="relationship-kind" onClick={() => onEdit(r)}>
+              <button className="relationship-kind" data-category={relationshipCategory(r)} title={relationshipCategory(r)} onClick={() => onEdit(r)}>
                 {relationshipLabel(r, selected)} ⌄
               </button>
               <p>{r.notes}</p>

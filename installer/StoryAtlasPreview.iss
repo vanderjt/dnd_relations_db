@@ -26,6 +26,8 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 
 [Files]
 Source: "..\dist\StoryAtlasPreview\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\examples\saved-stories\*.atlas-preview"; DestDir: "{localappdata}\StoryAtlasPreview\stories"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "..\examples\saved-stories\portrait-sources.json"; DestDir: "{localappdata}\StoryAtlasPreview\stories"; Flags: onlyifdoesntexist uninsneveruninstall
 Source: "..\build\installer-deps\MicrosoftEdgeWebView2RuntimeInstallerX64.exe"; Flags: dontcopy
 
 [Icons]
