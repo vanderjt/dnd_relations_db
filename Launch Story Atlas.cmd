@@ -6,7 +6,7 @@ if exist ".build-env\Scripts\python.exe" if exist "preview\dist\index.html" goto
 if exist "dist\StoryAtlasPreview\StoryAtlasPreview.exe" goto packaged
 if exist "%LOCALAPPDATA%\Programs\Story Atlas Preview\StoryAtlasPreview.exe" goto installed
 echo Story Atlas is not ready to launch.
-echo Run Setup in dist\installer, or follow README.md to set up source mode.
+echo Run Setup in installer, or follow README.md to set up source mode.
 pause
 exit /b 1
 :source

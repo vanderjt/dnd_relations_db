@@ -4,11 +4,20 @@ An offline storytelling workspace for worlds, chapters, events, characters, and 
 
 ## Open the app
 
-Double-click **Launch Story Atlas.cmd** in this folder.
+On a fresh Windows 10/11 x64 clone, run
+**installer/StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe**.
+Setup includes the app and offline WebView2 runtime; Python and Node.js are
+not required. Then double-click **Launch Story Atlas.cmd** in this folder,
+or use the desktop or Start Menu shortcut.
+
+The Setup EXE is stored in Git LFS. Install Git LFS before cloning and run
+`git lfs install`. If you already cloned, run `git lfs install` and
+`git lfs pull` from this repository to download the installer. GitHub's source
+ZIP may contain an LFS pointer instead of the executable; use a Git LFS clone.
 
 It uses this checkout when the Python environment and built frontend are available, then the local preview package, then the installed preview. It never opens the older Tkinter app. Errors stay visible instead of silently switching versions. Arguments such as `--home` are forwarded.
 
-For friends, copy the Setup EXE from **dist/installer** to a flash drive. Setup installs the app and creates a desktop icon. See the [offline installer guide](docs/OFFLINE_INSTALLER.md).
+For friends, copy the Setup EXE from **installer/** to a flash drive. Setup installs the app and creates a desktop icon. See the [offline installer guide](docs/OFFLINE_INSTALLER.md).
 
 Stories and backups normally live in `%LOCALAPPDATA%\StoryAtlasPreview`, outside this repository. Legacy stories use a different format; keep them intact.
 
@@ -22,8 +31,8 @@ live in `examples/saved-stories`. Open them with the normal story file picker.
 | `preview/` | Current React UI and frontend build |
 | `preview_main.py` | Current native app entry point |
 | `story_atlas/` | Python storage, logic, and legacy implementation |
-| `installer/` | Setup definition and installation instructions |
-| `dist/installer/` | Generated installer and checksum to distribute |
+| `installer/` | Ready-to-run Setup EXE (Git LFS), checksum, setup definition, and instructions |
+| `dist/` | Ignored intermediate packaged app used to build Setup |
 | `docs/` | Current plans, delivery notes, and architecture |
 | `docs/legacy/` | Older Tkinter guides and design/research history |
 | `tools/launchers/` | Explicit source, legacy, and browser-prototype launchers |

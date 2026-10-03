@@ -2,7 +2,10 @@
 
 Run `build_preview_installer.ps1` from Windows PowerShell to build the React
 preview, run focused tests, freeze its Python host, compile Setup, and generate
-a SHA-256 checksum. Output is in `dist/installer`. The installer creates desktop
+a SHA-256 checksum. Output is in `installer/`, alongside the tracked Setup
+definition and instructions. Setup EXEs are stored with Git LFS. After cloning,
+run `git lfs install` and `git lfs pull` if the EXE has not been downloaded.
+The installer creates desktop
 and Start Menu shortcuts and installs per user. It never deletes user stories
 or backups on uninstall.
 

@@ -19,8 +19,7 @@ $env:PYINSTALLER_CONFIG_DIR = Join-Path $PSScriptRoot 'build\pyinstaller-preview
 if ($LASTEXITCODE) { throw 'Application packaging failed' }
 & $Compiler installer/StoryAtlasPreview.iss
 if ($LASTEXITCODE) { throw 'Installer compilation failed' }
-$setup = Join-Path $PSScriptRoot 'dist\installer\StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe'
+$setup = Join-Path $PSScriptRoot 'installer\StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe'
 $hash = (Get-FileHash -LiteralPath $setup -Algorithm SHA256).Hash
 Set-Content -LiteralPath "$setup.sha256" -Value "$hash  $([IO.Path]::GetFileName($setup))"
-Copy-Item -LiteralPath 'installer/README.txt' -Destination 'dist/installer/README.txt' -Force
 Write-Host "Ready for verification: $setup"

@@ -1,5 +1,11 @@
 STORY ATLAS PREVIEW 0.1.0 — WINDOWS OFFLINE INSTALLER
 
+Installing from this Git repository
+Install Git LFS and run git lfs install before cloning. If already cloned,
+run git lfs install and git lfs pull from the repository folder. The Setup
+EXE in this folder must be downloaded as a binary, not an LFS pointer.
+Double-click it and follow the steps below. Python and Node.js are not needed.
+
 For friends installing from a flash drive
 1. Copy StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe to the drive.
 2. On the destination Windows 10/11 x64 PC, double-click that file.
