@@ -311,7 +311,7 @@ function App() {
     await flush();
     if (workspace) {
       const scrolls: Data = {};
-      for (const selector of [".sheet-scroll", ".story-detail", ".story-outline", ".cast-list", ".graph-connection-list"])
+      for (const selector of [".sheet-scroll", ".story-main", ".story-detail", ".story-outline", ".cast-list", ".graph-connection-list"])
         scrolls[selector] = document.querySelector(selector)?.scrollTop || 0;
       await api("preference", {key:"context", payload:{page,event_id:eventId,character_id:character,
         resume:{scrolls,create,editorKey:editRef.current?.key || null,
@@ -1298,6 +1298,7 @@ function App() {
                         </section>
                       ))}
                     </aside>
+                    <section className="story-main" aria-label="Story event editor" tabIndex={0}>
                     <div className="story-page-heading world-heading"><span className="eyebrow">THE SHAPE OF YOUR STORY</span><h1>Story of {workspace.title}</h1><p>Plan what happens. Follow the people it changes.</p></div>
                     <div className="story-detail">
                       {editor?.command === "save_event" && !create && (
@@ -1446,6 +1447,7 @@ function App() {
                         </>
                       )}
                     </div>
+                    </section>
                   </div>
                 )}
               </main>

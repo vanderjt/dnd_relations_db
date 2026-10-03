@@ -19,13 +19,15 @@ import webview
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--home', type=Path, required=True)
-parser.add_argument('--stage', choices=['create', 'reopen', 'sample', 'layout', 'failure', 'crash', 'recover-crash', 'x-close', 'x-reopen', 'x-save', 'x-saved-reopen', 'x-clean'], required=True)
+parser.add_argument('--stage', choices=['create', 'reopen', 'sample', 'layout', 'story-scroll', 'failure', 'crash', 'recover-crash', 'x-close', 'x-reopen', 'x-save', 'x-saved-reopen', 'x-clean'], required=True)
+parser.add_argument('--width', type=int)
+parser.add_argument('--height', type=int)
 args = parser.parse_args()
 worker = PreviewWorker(args.home, ROOT / 'prototypes/phase2/greyhaven.json')
 bridge = PreviewBridge(worker)
 window = webview.create_window('Story Atlas Preview — native smoke', str(ROOT / 'preview/dist/index.html'),
-                              js_api=bridge, width=900 if args.stage == 'layout' else 1280,
-                              height=600 if args.stage == 'layout' else 800, min_size=(760, 560), text_select=True)
+                              js_api=bridge, width=args.width or (900 if args.stage == 'layout' else 1280),
+                              height=args.height or (600 if args.stage == 'layout' else 800), min_size=(760, 560), text_select=True)
 bridge._window = window
 window.events.closing += bridge._on_closing
 finished = threading.Event()
@@ -106,6 +108,40 @@ SAMPLE = r'''
 await click('Try Greyhaven sample');await wait(()=>document.querySelector('.story-detail')&&ready(),'sample loaded');
 const w=await window.pywebview.api.command('workspace',{});assert(w.data.characters.length===18&&w.data.events.length===10,'sample through bridge');
 return {passed:true,path:w.data.path,checks:['native Greyhaven sample through bridge']};
+'''
+
+STORY_SCROLL = r'''
+if(button('Try Greyhaven sample')) await click('Try Greyhaven sample');
+await click('Story');
+const main=document.querySelector('.story-main');
+const outline=document.querySelector('.story-outline');
+assert(main&&outline,'story scroll regions');
+const originalHeading=document.querySelector('.story-page-heading h1').textContent;
+for(const theme of ['storybook','gothic']){
+  input('Theme',theme);await new Promise(r=>setTimeout(r,150));
+  document.querySelector('.story-page-heading h1').textContent='Story of '+ 'A long story title '.repeat(12);
+  main.scrollTop=0;
+  assert(main.scrollHeight>main.clientHeight,'complete form exceeds viewport '+JSON.stringify({height:main.clientHeight,scroll:main.scrollHeight,viewport:innerHeight,detail:document.querySelector('.story-detail').getBoundingClientRect().height,overflow:getComputedStyle(main).overflowY}));
+  const headingTop=document.querySelector('.story-page-heading').getBoundingClientRect().top;
+  main.scrollTop=main.scrollHeight;
+  await new Promise(r=>requestAnimationFrame(r));
+  assert(main.scrollTop>0,'main page scrolls');
+  assert(document.querySelector('.story-page-heading').getBoundingClientRect().top<headingTop,'heading scrolls with form');
+  const save=[...main.querySelectorAll('button')].find(x=>x.textContent.trim()==='Save event');
+  const saveRect=save.getBoundingClientRect(), mainRect=main.getBoundingClientRect();
+  assert(mainRect.bottom<=innerHeight+1,'editor fits viewport height');
+  assert(saveRect.top>=mainRect.top&&saveRect.bottom<=mainRect.bottom+1,'save action reachable '+JSON.stringify({save:saveRect.toJSON(),main:mainRect.toJSON(),scroll:main.scrollTop,height:main.clientHeight,total:main.scrollHeight}));
+  assert(main.scrollWidth<=main.clientWidth+1,'editor has no horizontal overflow');
+  assert(document.documentElement.scrollWidth<=innerWidth+1,'page fits window width');
+  if(innerWidth<=800){
+    assert(outline.getBoundingClientRect().bottom<=mainRect.top+1,'outline stacks above editor');
+    assert(mainRect.width>innerWidth-30,'narrow editor uses window width');
+  }else{
+    assert(outline.getBoundingClientRect().right<=mainRect.left+1,'wide layout uses columns');
+  }
+}
+document.querySelector('.story-page-heading h1').textContent=originalHeading;
+return {passed:true,viewport:[innerWidth,innerHeight],checks:['whole story page scrolls','long title wraps','save actions reachable','responsive outline','Storybook and Gothic']};
 '''
 
 LAYOUT = r'''
@@ -200,7 +236,7 @@ def smoke():
             worker.call('bootstrap')
             worker._pool.submit(lambda: worker._store.connection.execute(
                 "CREATE TEMP TRIGGER injected_failure BEFORE INSERT ON activity WHEN NEW.action='save_profile' BEGIN SELECT RAISE(ABORT,'injected storage failure'); END")).result()
-        script = COMMON + {'create': CREATE, 'reopen': REOPEN, 'sample': SAMPLE, 'layout': LAYOUT,
+        script = COMMON + {'create': CREATE, 'reopen': REOPEN, 'sample': SAMPLE, 'layout': LAYOUT, 'story-scroll': STORY_SCROLL,
                            'failure': FAILURE, 'crash': CRASH, 'recover-crash': RECOVER_CRASH, 'x-close': X_CLOSE, 'x-reopen': X_REOPEN, 'x-save': X_CLOSE.replace('Draft kept after native X','Saved after native X'), 'x-saved-reopen': X_REOPEN.replace('Draft kept after native X','Saved after native X').replace('return {passed:true,checks:', "const saved=(await window.pywebview.api.command('workspace',{})).data;assert(saved.drafts.length===0,'no uncommitted draft after Save and close');assert(saved.characters.some(c=>c.notes==='Saved after native X'),'saved facts survived exit');return {passed:true,checks:").replace('pending text restored','committed text restored'), 'x-clean': "return {passed:true,checks:['clean native X closes without prompt']};"}[args.stage]
         window.evaluate_js('(async()=>{try{' + script + '}catch(e){return {passed:false,error:e.stack};}})()', on_result)
         if not finished.wait(55):
