@@ -98,13 +98,18 @@ function App() {
   const [editor, setEditor] = useState<Editor | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [notice, setNotice] = useState(""),
+    [notification, setNotification] = useState({ text: "" }),
     [draftState, setDraftState] = useState("");
+  const notice = notification.text;
+  function setNotice(text: string) {
+    // A new notification restarts the timeout even when its text is unchanged.
+    setNotification({ text });
+  }
   useEffect(() => {
-    if (notice !== "Story opened.") return;
+    if (!notification.text) return;
     const timer = window.setTimeout(() => setNotice(""), 3000);
     return () => window.clearTimeout(timer);
-  }, [notice]);
+  }, [notification]);
   const [review, setReview] = useState(false),
     [closeRequested, setCloseRequested] = useState(false),
     [collapsedChapters, setCollapsedChapters] = useState<number[]>([]),
