@@ -1,10 +1,35 @@
 STORY ATLAS PREVIEW 0.1.0 — WINDOWS OFFLINE INSTALLER
 
 Installing from this Git repository
-Install Git LFS and run git lfs install before cloning. If already cloned,
-run git lfs install and git lfs pull from the repository folder. The Setup
-EXE in this folder must be downloaded as a binary, not an LFS pointer.
-Double-click it and follow the steps below. Python and Node.js are not needed.
+1. Use a Windows 10/11 x64 PC. Install Git and Git LFS if needed:
+     Git: https://git-scm.com/downloads/win
+     Git LFS: https://git-lfs.com/
+2. Open PowerShell in the folder where you want the repository, then run:
+     git lfs install
+     git clone --branch phase2-ui-design https://github.com/vanderjt/dnd_relations_db.git
+     cd dnd_relations_db
+     git lfs pull
+3. In File Explorer, open the repository's installer folder and double-click:
+     StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe
+4. Follow Setup and leave "Create a desktop shortcut" checked.
+5. Open Story Atlas Preview from the desktop or Start menu. You can also
+   double-click Launch Story Atlas.cmd in the repository's main folder.
+
+If you already cloned the repository, open PowerShell in its main folder:
+  git fetch origin
+  git switch phase2-ui-design
+  git pull --ff-only
+  git lfs install
+  git lfs pull
+Then run the Setup EXE in this installer folder as described above. Save or
+commit any local edits before switching branches or pulling updates.
+
+Use the phase2-ui-design branch: that is where this installer is published.
+Use a Git LFS clone instead of GitHub's Download ZIP. The installer is about
+228 MB; a tiny text file starting with "version https://git-lfs.github.com"
+is an LFS pointer. Run git lfs pull to download the real executable.
+Internet access is needed to clone and download the installer. After that,
+Setup runs offline. Python and Node.js are not needed to install or run the app.
 
 For friends installing from a flash drive
 1. Copy StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe to the drive.
