@@ -28,6 +28,48 @@ Mac dependencies, and builds the frontend. Initial setup needs internet access.
 The app uses macOS's built-in WebKit through pywebview; it does not need Windows
 WebView2. See the [pywebview platform guide](https://pywebview.flowrl.com/guide/web_engine.html).
 
+## Run preview_main.py directly (without a launcher)
+
+Open Terminal in the repository's main folder. Install dependencies into a
+Mac-created environment and build the frontend once:
+
+```bash
+python3.13 -m venv .mac-env
+.mac-env/bin/python -m pip install -r requirements-preview-macos.txt
+cd preview
+npm ci
+npm run build
+cd ..
+```
+
+Run the Python source directly:
+
+```bash
+.mac-env/bin/python preview_main.py
+```
+
+Use that same command on later launches. After pulling frontend updates, run
+`npm run build` inside `preview` before launching again. After requirements
+change, rerun the pip install command above.
+
+If you received a copied repository folder from someone else, create your
+Python environment on your own Mac. Do not reuse their `.build-env` or
+`.mac-env`: Python environments are not portable between computers. If a
+copied `.mac-env` already exists, rename it before creating a fresh one:
+
+```bash
+mv .mac-env ".mac-env-copied-$(date +%Y%m%d-%H%M%S)"
+python3.13 -m venv .mac-env
+```
+
+The `.cmd` launcher, `.exe` installer, and `dist/StoryAtlasPreview` Windows
+package are not used by this source command. If importing the host fails,
+run this with the same environment and use the resulting error to diagnose it:
+
+```bash
+.mac-env/bin/python -c "import webview; print('Preview host ready')"
+```
+
 ## Later launches and updates
 
 Double-click the same launcher. Dependencies and frontend assets are reused.

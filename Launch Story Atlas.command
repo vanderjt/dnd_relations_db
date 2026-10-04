@@ -72,5 +72,6 @@ if [ ! -f 'preview/dist/index.html' ] || [ ! -f 'preview/dist/app.js' ] || [ "$f
   printf '%s\n' "$frontend_hash" > .mac-env/frontend.sha256
 fi
 
-echo 'Starting Story Atlas...'
+echo 'Starting Story Atlas from Python source: preview_main.py'
+echo "Python environment: $(pwd)/$python"
 "$python" preview_main.py "$@"
