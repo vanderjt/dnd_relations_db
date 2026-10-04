@@ -25,10 +25,31 @@ EXE containing the frozen host, frontend assets, Greyhaven sample, and full
 WebView2 runtime. Setup checks the documented EdgeUpdate runtime registry key
 and invokes the included installer only when the runtime is missing.
 
-Version and output filename currently live in `installer/StoryAtlasPreview.iss`
-and `build_preview_installer.ps1`; update both together for a new release.
+Version lives in `installer/StoryAtlasPreview.iss`; the output filename and
+build script derive it from that definition. Increase the version for each
+release and update user-facing filenames in the READMEs. The build writes
+`installer/release.json` with the version, source commit, filename, and SHA-256.
+Commit and publish the new EXE, checksum, and manifest together through Git LFS.
+Remove the superseded EXE and checksum from the current checkout after the
+new release passes verification.
 This uses `StoryAtlasPreview.spec`, not the legacy Tkinter `StoryAtlas.spec`.
 No signing certificate is configured; Setup and the application are unsigned.
+
+## Updating installed copies
+
+Users close the app, run `git pull --ff-only` and `git lfs pull`, then open
+`installer/Manage Story Atlas.cmd`. Install/update runs the verified bundled
+Setup over the installed copy. Its stable AppId keeps it registered as the same
+app. Uninstall/reinstall validates the new Setup first, invokes the registered
+uninstaller, and installs again only after uninstall completes. The menu never
+deletes the story data directory. Ordinary Setup and uninstall dialogs remain
+visible, and cancellation stops the operation. A Start Menu uninstall shortcut
+is included in new installations.
+
+Publish rebuilt installers when changing packaged features. The manager does
+not build source or silently download updates. Mac source users can pull and
+run `Launch Story Atlas.command` to refresh dependencies and built assets; see
+`installer/README-MAC.md`.
 
 ## Acceptance evidence
 

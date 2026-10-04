@@ -5,7 +5,7 @@ An offline storytelling workspace for worlds, chapters, events, characters, and 
 ## Open the app
 
 On a fresh Windows 10/11 x64 clone, run
-**installer/StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe**.
+**installer/StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe**.
 Setup includes the app and offline WebView2 runtime; Python and Node.js are
 not required. Then double-click **Launch Story Atlas.cmd** in this folder,
 or use the desktop or Start Menu shortcut.
@@ -20,6 +20,18 @@ It uses this checkout when the Python environment and built frontend are availab
 For friends, copy the Setup EXE from **installer/** to a flash drive. Setup installs the app and creates a desktop icon. See the [offline installer guide](docs/OFFLINE_INSTALLER.md).
 
 Stories and backups normally live in `%LOCALAPPDATA%\StoryAtlasPreview`, outside this repository. Legacy stories use a different format; keep them intact.
+
+## Update or reinstall on Windows
+
+Close the app, pull the latest repository changes, and run `git lfs pull`.
+Double-click **installer/Manage Story Atlas.cmd**, then choose **Install/update**.
+This replaces the installed app with the bundled release while preserving
+stories and backups. The menu also offers uninstall and uninstall/reinstall.
+You can uninstall from Windows Settings or the Start Menu shortcut too.
+
+An installed app only gains new features when a new installer has been built
+and published. Pulling source changes alone does not update the installed app.
+The manager shows the bundled version and source commit before installing.
 
 ## Run from a Mac clone
 

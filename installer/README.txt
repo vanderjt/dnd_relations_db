@@ -1,4 +1,4 @@
-STORY ATLAS PREVIEW 0.1.0 — WINDOWS OFFLINE INSTALLER
+STORY ATLAS PREVIEW 0.1.1 — WINDOWS OFFLINE INSTALLER
 
 Mac users: see README-MAC.md in this folder. Use Launch Story Atlas.command
 in the repository's main folder; this Windows Setup EXE does not run on macOS.
@@ -13,7 +13,7 @@ Installing from this Git repository
      cd dnd_relations_db
      git lfs pull
 3. In File Explorer, open the repository's installer folder and double-click:
-     StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe
+     StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe
 4. Follow Setup and leave "Create a desktop shortcut" checked.
 5. Open Story Atlas Preview from the desktop or Start menu. You can also
    double-click Launch Story Atlas.cmd in the repository's main folder.
@@ -35,7 +35,7 @@ Internet access is needed to clone and download the installer. After that,
 Setup runs offline. Python and Node.js are not needed to install or run the app.
 
 For friends installing from a flash drive
-1. Copy StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup.exe to the drive.
+1. Copy StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe to the drive.
 2. On the destination Windows 10/11 x64 PC, double-click that file.
 3. Follow Setup and leave "Create a desktop shortcut" checked.
 4. Open Story Atlas Preview from the desktop or Start menu.
@@ -48,6 +48,33 @@ offline WebView2 runtime, which it installs if missing.
 
 This preview installer is not code-signed. Windows may identify its publisher
 as unknown. The embedded Microsoft runtime is signed by Microsoft.
+
+Updates, uninstall, and reinstall
+1. Save your edits and close Story Atlas.
+2. In PowerShell in the repository folder, run:
+     git pull --ff-only
+     git lfs pull
+3. Double-click Manage Story Atlas.cmd in this installer folder.
+4. Choose 1 (Install/update) and follow Setup. This replaces the installed
+   app without needing to uninstall it first. Your stories and backups remain.
+5. Reopen the installed app using its desktop or Start Menu shortcut.
+
+The menu also provides option 2 (Uninstall) and option 3 (Uninstall/reinstall).
+Option 3 checks the new installer before removing the old app. Cancelling
+uninstall stops the reinstall. Each operation uses the normal Setup dialogs.
+You can also uninstall using Windows Settings > Apps > Story Atlas Preview,
+or the Start Menu's Uninstall Story Atlas Preview shortcut.
+
+The menu checks the installer's SHA-256 against release.json before installing.
+Keep Manage Story Atlas.cmd, manage_installation.ps1, release.json, and the
+Setup EXE together if copying the manager to a flash drive. The Setup EXE
+alone still works when double-clicked.
+
+New source code does not automatically update the installed app. A new Setup
+build must be published for each release. The manager displays the bundled
+version and source commit so you can identify which release you are installing.
+Use installed desktop/Start Menu shortcuts for that release: the repository's
+root launcher can prefer source mode or a local developer package instead.
 
 Your files
 The app installs for your Windows account in:

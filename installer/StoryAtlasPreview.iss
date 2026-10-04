@@ -1,4 +1,4 @@
-#define AppVersion "0.1.0"
+#define AppVersion "0.1.1"
 [Setup]
 AppId={{B1A827F6-93A7-4365-A494-D793125179DA}
 AppName=Story Atlas Preview
@@ -11,7 +11,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
 OutputDir=.
-OutputBaseFilename=StoryAtlasPreview-0.1.0-Windows-x64-Offline-Setup
+OutputBaseFilename=StoryAtlasPreview-{#AppVersion}-Windows-x64-Offline-Setup
 SetupIconFile=..\story_atlas\resources\story-atlas.ico
 UninstallDisplayIcon={app}\StoryAtlasPreview.exe
 Compression=lzma2
@@ -33,6 +33,7 @@ Source: "..\build\installer-deps\MicrosoftEdgeWebView2RuntimeInstallerX64.exe"; 
 [Icons]
 Name: "{userdesktop}\Story Atlas Preview"; Filename: "{app}\StoryAtlasPreview.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 Name: "{userprograms}\Story Atlas Preview"; Filename: "{app}\StoryAtlasPreview.exe"; WorkingDir: "{app}"
+Name: "{userprograms}\Uninstall Story Atlas Preview"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\StoryAtlasPreview.exe"; Description: "Open Story Atlas Preview"; Flags: nowait postinstall skipifsilent
