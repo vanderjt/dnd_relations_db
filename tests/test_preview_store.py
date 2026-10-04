@@ -7,7 +7,6 @@ import tempfile
 import unittest
 import uuid
 
-from story_atlas.database import Database
 from story_atlas.preview_store import PreviewStore, Conflict
 from story_atlas.preview_worker import PreviewWorker
 
@@ -169,21 +168,18 @@ class PreviewTests(unittest.TestCase):
             PreviewStore(missing)
         self.assertFalse(missing.exists())
         legacy_path = self.home / 'legacy.db'
-        legacy = Database(legacy_path)
+        with sqlite3.connect(legacy_path) as legacy:
+            legacy.execute('CREATE TABLE characters (id INTEGER PRIMARY KEY, name TEXT)')
         legacy.close()
         before = legacy_path.read_bytes()
         with self.assertRaises(ValueError):
             PreviewStore(legacy_path)
         self.assertEqual(before, legacy_path.read_bytes())
-        before = self.path.read_bytes()
-        with self.assertRaises(ValueError):
-            Database(self.path)
-        self.assertEqual(before, self.path.read_bytes())
         with self.assertRaises(FileExistsError):
             PreviewStore.create(self.path, 'Overwrite')
 
     def test_worker_serializes_concurrent_requests_and_reopens(self):
-        sample = Path(__file__).resolve().parents[1] / 'prototypes/phase2/greyhaven.json'
+        sample = Path(__file__).resolve().parents[1] / 'story_atlas/resources/greyhaven.json'
         worker = PreviewWorker(self.home / 'worker', sample)
         try:
             self.assertTrue(worker.call('open_story', {'path': str(self.path)})['ok'])
@@ -255,7 +251,7 @@ class PreviewTests(unittest.TestCase):
             restored.close()
 
     def test_sample_preserves_every_connection_snapshot_and_multiple_pairs(self):
-        sample = json.loads((Path(__file__).resolve().parents[1] / 'prototypes/phase2/greyhaven.json').read_text(encoding='utf-8'))
+        sample = json.loads((Path(__file__).resolve().parents[1] / 'story_atlas/resources/greyhaven.json').read_text(encoding='utf-8'))
         store = PreviewStore.create(self.home / 'sample.atlas-preview', 'Greyhaven', sample)
         try:
             keys = ('id', 'source_id', 'target_id', 'kind', 'semantics', 'inverse_label', 'notes', 'category')
@@ -282,7 +278,7 @@ class PreviewTests(unittest.TestCase):
         self.assertEqual(self.store.rows('SELECT * FROM world_entries'), [])
 
     def test_worker_backup_restore_missing_open_and_safe_filenames(self):
-        sample = Path(__file__).resolve().parents[1] / 'prototypes/phase2/greyhaven.json'
+        sample = Path(__file__).resolve().parents[1] / 'story_atlas/resources/greyhaven.json'
         worker = PreviewWorker(self.home / 'worker', sample)
         try:
             opened = worker.call('new_story', {'title': 'CON: A / story?'})
@@ -303,7 +299,7 @@ class PreviewTests(unittest.TestCase):
 
     def test_bridge_picker_cancellation_and_command_allowlist(self):
         from preview_main import PreviewBridge
-        sample = Path(__file__).resolve().parents[1] / 'prototypes/phase2/greyhaven.json'
+        sample = Path(__file__).resolve().parents[1] / 'story_atlas/resources/greyhaven.json'
         worker = PreviewWorker(self.home / 'cancel', sample)
         class Window:
             def create_file_dialog(self, *args, **kwargs):
@@ -319,7 +315,7 @@ class PreviewTests(unittest.TestCase):
             worker.close()
 
     def test_restore_without_an_open_story(self):
-        sample = Path(__file__).resolve().parents[1] / 'prototypes/phase2/greyhaven.json'
+        sample = Path(__file__).resolve().parents[1] / 'story_atlas/resources/greyhaven.json'
         worker = PreviewWorker(self.home / 'fresh', sample)
         try:
             result = worker.call('restore', {'path': str(self.path)})

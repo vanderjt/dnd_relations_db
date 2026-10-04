@@ -63,7 +63,7 @@ const initials = (s: string) =>
 async function api(name: string, args: Data = {}): Promise<Reply> {
   if (!window.pywebview)
     throw new Error(
-      "The native bridge is unavailable. Launch Story Atlas Preview.cmd.",
+      "The native bridge is unavailable. Run preview_main.py with the platform's Python environment.",
     );
   const result = await window.pywebview.api.command(name, args);
   if (!result.ok)

@@ -1,77 +1,78 @@
-# Preview offline installer
+# Build and distribute the Windows installer
 
-Run `build_preview_installer.ps1` from Windows PowerShell to build the React
-preview, run focused tests, freeze its Python host, compile Setup, and generate
-a SHA-256 checksum. Output is in `installer/`, alongside the tracked Setup
-definition and instructions. Setup EXEs are stored with Git LFS. After cloning,
-run `git lfs install` and `git lfs pull` if the EXE has not been downloaded.
-The installer creates desktop
-and Start Menu shortcuts and installs per user. It never deletes user stories
-or backups on uninstall.
+End users can install the ready-made EXE in `installer/` without Python or Node.
+See [Windows instructions](../installer/README.txt) for install, update,
+uninstall, and reinstall, and the [user guide](USER_GUIDE.md) for using the app.
 
 ## Build prerequisites
 
-- CPython 3.13 x64 in `.build-env`, with `requirements-preview.txt` and
-  PyInstaller 6.22.0 installed; Node.js and `npm ci` in `preview`.
-- Inno Setup 6.7.3 compiler at `build/inno/ISCC.exe`, or supply `-Compiler`.
+Use Windows x64 with Python 3.13, Node.js LTS, and the repository's source files.
+Create `.build-env` and install both runtime and packaging dependencies:
+
+```powershell
+py -3.13 -m venv .build-env
+.\.build-env\Scripts\python.exe -m pip install -r requirements-preview.txt -r requirements-build.lock.txt
+cd preview
+npm ci
+cd ..
+```
+
+Prepare these build dependencies once:
+
+- Inno Setup 6.7.3 at `build/inno/ISCC.exe`, or pass its path with `-Compiler`.
   Obtain it from https://jrsoftware.org/isinfo.php and observe its license.
-- Microsoft's x64 Evergreen Standalone WebView2 installer at
+- Microsoft's signed x64 Evergreen Standalone WebView2 installer at
   `build/installer-deps/MicrosoftEdgeWebView2RuntimeInstallerX64.exe`.
   Official download: https://go.microsoft.com/fwlink/?linkid=2124701.
-  The build verifies a valid Microsoft Authenticode signature.
 
-Build dependencies need downloading once. End users receive a single Setup
-EXE containing the frozen host, frontend assets, Greyhaven sample, and full
-WebView2 runtime. Setup checks the documented EdgeUpdate runtime registry key
-and invokes the included installer only when the runtime is missing.
+## Build and publish
 
-Version lives in `installer/StoryAtlasPreview.iss`; the output filename and
-build script derive it from that definition. Increase the version for each
-release and update user-facing filenames in the READMEs. The build writes
-`installer/release.json` with the version, source commit, filename, and SHA-256.
-Commit and publish the new EXE, checksum, and manifest together through Git LFS.
-Remove the superseded EXE and checksum from the current checkout after the
-new release passes verification.
-This uses `StoryAtlasPreview.spec`, not the legacy Tkinter `StoryAtlas.spec`.
-No signing certificate is configured; Setup and the application are unsigned.
+1. Update `AppVersion` in `installer/StoryAtlasPreview.iss` and the release
+   filenames in the READMEs. Commit the source changes to identify the build.
+2. Run `build_preview_installer.ps1`. It builds the frontend from `preview/assets`,
+   runs current app and example checks, freezes Python with `StoryAtlasPreview.spec`,
+   verifies the Microsoft runtime signature, and compiles the offline Setup.
+3. Verify the generated release. The script creates the EXE, `.sha256`, and
+   `release.json` in `installer/`. The manifest records the version, source
+   commit, filename, and checksum.
+4. Remove the superseded EXE and checksum from the current checkout after the
+   new release passes checks. Commit and push the new release files together.
+   EXEs use Git LFS; the manifests and documentation use ordinary Git.
 
-## Updating installed copies
+Keep the installer AppId stable across releases so Setup updates the same app.
+The app installs per user and includes the frozen host, frontend, sample,
+examples, and offline WebView2 runtime. The runtime is installed only if missing.
+Setup and the app are unsigned; no signing certificate is configured.
 
-Users close the app, run `git pull --ff-only` and `git lfs pull`, then open
-`installer/Manage Story Atlas.cmd`. Install/update runs the verified bundled
-Setup over the installed copy. Its stable AppId keeps it registered as the same
-app. Uninstall/reinstall validates the new Setup first, invokes the registered
-uninstaller, and installs again only after uninstall completes. The menu never
-deletes the story data directory. Ordinary Setup and uninstall dialogs remain
-visible, and cancellation stops the operation. A Start Menu uninstall shortcut
-is included in new installations.
+## Verify a release
 
-Publish rebuilt installers when changing packaged features. The manager does
-not build source or silently download updates. Mac source users can pull and
-run `Launch Story Atlas.command` to refresh dependencies and built assets; see
-`installer/README-MAC.md`.
+```powershell
+.\.build-env\Scripts\python.exe -m unittest discover -s tests -q
+.\.build-env\Scripts\python.exe tools/verify_examples.py
+powershell -NoProfile -ExecutionPolicy Bypass -File installer/manage_installation.ps1 -Action Check
+.\.build-env\Scripts\python.exe tools/verify_installer_lifecycle.py
+```
 
-## Acceptance evidence
+The lifecycle check requires a current frozen package in `dist/StoryAtlasPreview`.
+It compiles a separate test installer with a unique AppId and disposable app/data
+folders. It checks install, update, uninstall, reinstall, and story/backup/example
+preservation, then uninstalls the test app. It omits the WebView2 bootstrapper.
+Use `tools/preview_native_smoke.py` only with a disposable `--home`; its script
+contains the available workflow and layout stages. Verification artifacts are
+ignored under `build-verification/`.
 
-On October 3, 2026, release 0.1.1 passed the frontend build, 34 focused Python
-tests, and all three example-story checks. The installation manager verified
-the production Setup checksum. `tools/verify_installer_lifecycle.py` passed
-install, update, uninstall, and reinstall with a unique test AppId and disposable
-app/data directories. Stories, backups, and an edited included example remained
-byte-for-byte unchanged, and the test app registration was removed. This test
-uses the real frozen app payload but omits the WebView2 bootstrapper; it does
-not verify missing-runtime installation. Evidence lives in ignored
-`build-verification/lifecycle-*` directories.
+Native Mac testing and clean-machine Windows testing without preinstalled
+WebView2 or with networking disabled are still pending.
 
-On October 2, 2026 the frontend build and 28 focused Python tests passed.
-The frozen app loaded its bundled sample. The generated installer returned
-exit code 0, and both shortcut files were verified. The installed executable
-reopened the disposable saved sample after the frozen app closed through X.
-Installer log: `build-verification/installer.log` (ignored local evidence).
+## Updating installed users
 
-Clean-machine testing without preinstalled WebView2/Python/Node and with
-networking disabled remains outstanding. The missing-runtime installation path
-and uninstall/upgrade behavior have not been exercised on a clean machine.
-Target friends' Windows 10/11 x64 PCs for this preview; do not claim broader
-platform certification. See `installer/README.txt` for distribution instructions
-and `docs/MVP_DELIVERY.md` for existing feature limitations.
+Publish a rebuilt installer for packaged feature changes. Users close the app,
+pull the repository and LFS files, and open **installer/Manage Story Atlas.cmd**.
+**Install/update** replaces the app without uninstalling first. **Uninstall** and
+**Uninstall/reinstall** preserve the separate story directory. The manager
+verifies the replacement before uninstalling and uses the registered uninstaller
+for custom paths. Cancelling uninstall stops the reinstall.
+
+The manager does not build source or silently download updates. Mac source
+users can pull and run `Launch Story Atlas.command` to refresh dependencies
+and assets; see [Mac instructions](../installer/README-MAC.md).

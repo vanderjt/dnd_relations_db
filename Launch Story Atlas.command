@@ -49,9 +49,7 @@ from pathlib import Path
 digest = hashlib.sha256()
 for name in ('preview/package.json', 'preview/package-lock.json', 'preview/build.mjs',
              'preview/index.html', 'preview/tsconfig.json', 'preview/src',
-             'prototypes/phase2/studio.css', 'prototypes/phase2/refinements.css',
-             'prototypes/phase2/type.css', 'prototypes/phase2/themes',
-             'prototypes/phase2/ornaments'):
+             'preview/assets'):
     root = Path(name)
     files = sorted(p for p in root.rglob('*') if p.is_file()) if root.is_dir() else [root]
     for file in files:

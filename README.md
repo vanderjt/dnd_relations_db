@@ -1,74 +1,98 @@
 # Story Atlas
 
-An offline storytelling workspace for worlds, chapters, events, characters, and their changing relationships. The current app uses React, Python, SQLite, and pywebview.
+An offline workspace for story events, characters, world references, and changing
+relationships. The current app uses React, Python, SQLite, and pywebview.
 
-## Open the app
+## Install on Windows
 
-On a fresh Windows 10/11 x64 clone, run
-**installer/StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe**.
-Setup includes the app and offline WebView2 runtime; Python and Node.js are
-not required. Then double-click **Launch Story Atlas.cmd** in this folder,
-or use the desktop or Start Menu shortcut.
+Install Git LFS once, then clone the housekeeping branch:
 
-The Setup EXE is stored in Git LFS. Install Git LFS before cloning and run
-`git lfs install`. If you already cloned, run `git lfs install` and
-`git lfs pull` from this repository to download the installer. GitHub's source
-ZIP may contain an LFS pointer instead of the executable; use a Git LFS clone.
+```powershell
+git lfs install
+git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
+cd dnd_relations_db
+git lfs pull
+```
 
-It uses this checkout when the Python environment and built frontend are available, then the local preview package, then the installed preview. It never opens the older Tkinter app. Errors stay visible instead of silently switching versions. Arguments such as `--home` are forwarded.
+Run **installer/StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe** on Windows
+10/11 x64. It includes the app and offline WebView2 runtime; Python and Node.js
+are not needed. Open the installed desktop or Start Menu shortcut afterward.
+The Setup EXE can also be shared directly without Git or Git LFS.
 
-For friends, copy the Setup EXE from **installer/** to a flash drive. Setup installs the app and creates a desktop icon. See the [offline installer guide](docs/OFFLINE_INSTALLER.md).
+To update, close the app, pull the repository and LFS files, then double-click
+**installer/Manage Story Atlas.cmd** and choose **Install/update**. The same menu
+can uninstall or reinstall while preserving stories and backups. Installed
+copies only gain new features when a new installer is built and published.
+See [Windows installation instructions](installer/README.txt).
 
-Stories and backups normally live in `%LOCALAPPDATA%\StoryAtlasPreview`, outside this repository. Legacy stories use a different format; keep them intact.
+## Run from source
 
-## Update or reinstall on Windows
+Install Python 3.13 (development used 3.13.9) and Node.js LTS. Mac users can
+skip the Windows installer download when cloning:
 
-Close the app, pull the latest repository changes, and run `git lfs pull`.
-Double-click **installer/Manage Story Atlas.cmd**, then choose **Install/update**.
-This replaces the installed app with the bundled release while preserving
-stories and backups. The menu also offers uninstall and uninstall/reinstall.
-You can uninstall from Windows Settings or the Start Menu shortcut too.
+```bash
+GIT_LFS_SKIP_SMUDGE=1 git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
+cd dnd_relations_db
+bash "Launch Story Atlas.command"
+```
 
-An installed app only gains new features when a new installer has been built
-and published. Pulling source changes alone does not update the installed app.
-The manager shows the bundled version and source commit before installing.
+The Mac launcher creates its local environment, installs dependencies, builds
+changed frontend assets, and runs `preview_main.py`. See [Mac instructions](installer/README-MAC.md)
+for direct Python launch and troubleshooting. Native Mac testing is pending.
 
-## Run from a Mac clone
+On Windows, install WebView2 if needed, then run in PowerShell:
 
-Install Python 3.13 and Node.js LTS, then double-click **Launch Story
-Atlas.command** in the repository's main folder. It creates `.mac-env`, installs
-macOS dependencies, builds the frontend, and opens the app. First setup needs
-internet access; later launches reuse the environment and built assets.
+```powershell
+py -3.13 -m venv .build-env
+.\.build-env\Scripts\python.exe -m pip install -r requirements-preview.txt
+cd preview
+npm ci
+npm run build
+cd ..
+.\.build-env\Scripts\python.exe preview_main.py
+```
 
-See [Mac launcher instructions](installer/README-MAC.md) for cloning, Terminal
-commands, and troubleshooting. This source launcher has not yet been tested on
-a Mac. The Windows Setup EXE does not run on macOS.
+**Launch Story Atlas.cmd** uses source when its environment and built frontend
+exist, otherwise a local packaged app or the installed copy. It reports which
+mode it launches. After source UI changes, run `npm run build` in `preview`.
 
-## Where things live
+## Use the app
 
-Ready-made [Frankenstein, Dracula, and Edgerunners examples](examples/saved-stories/README.md)
-live in `examples/saved-stories`. Open them with the normal story file picker.
+See the [user guide](docs/USER_GUIDE.md). Ready-made
+[Frankenstein, Dracula, and Edgerunners stories](examples/saved-stories/README.md)
+are included. Greyhaven is available from the welcome screen.
+
+Stories and backups normally live outside the repository:
+`%LOCALAPPDATA%\StoryAtlasPreview` on Windows and
+`~/Library/Application Support/StoryAtlasPreview` on Mac. Use the app's backup
+command to transfer stories. Uninstalling the Windows app preserves these files.
+
+## Repository layout
 
 | Location | Purpose |
 | --- | --- |
-| `preview/` | Current React UI and frontend build |
-| `preview_main.py` | Current native app entry point |
-| `story_atlas/` | Python storage, logic, and legacy implementation |
-| `installer/` | Ready-to-run Setup EXE (Git LFS), checksum, setup definition, and instructions |
-| `dist/` | Ignored intermediate packaged app used to build Setup |
-| `docs/` | Current plans, delivery notes, and architecture |
-| `docs/legacy/` | Older Tkinter guides and design/research history |
-| `tools/launchers/` | Explicit source, legacy, and browser-prototype launchers |
-| `tests/`, `tools/` | Tests and developer utilities |
-| `prototypes/` | Design reference and sample data; still used by the app/build |
-| `project-snapshots/` | Preserved recovery archives |
-| `build/`, `build-verification/` | Ignored build dependencies and test evidence |
-| `data/` | Existing local data; preserved |
+| `preview_main.py` | Native source entry point |
+| `preview/src/` | React UI |
+| `preview/assets/` | Current styles, themes, and artwork |
+| `story_atlas/` | Current SQLite storage, worker, profile resolution, and relationship validation |
+| `story_atlas/resources/` | Greyhaven sample and Windows icon |
+| `examples/saved-stories/` | Supported example stories and portrait credits |
+| `installer/` | Windows release, checksum, setup definition, manager, and platform instructions |
+| `docs/` | User guide and installer build instructions |
+| `tests/`, `tools/` | Current app checks and release verification |
 
-## Develop or rebuild
+Generated frontend files, Python environments, build dependencies, packaging
+output, verification data, and local story data are ignored by Git. Old Tkinter
+and browser prototype implementations have been removed from this branch.
 
-Create `.build-env` with Python 3.13 x64, install `requirements-preview.txt`, then run `npm ci` and `npm run build` inside `preview`. Use the root launcher afterward. Source-only launch is available in `tools/launchers/Launch Preview Source.cmd`.
+## Verify and build a release
 
-Run `build_preview_installer.ps1` to build the offline installer; prerequisites are in the [build guide](docs/OFFLINE_INSTALLER.md). `build_windows.ps1` and `StoryAtlas.spec` remain for legacy Tkinter builds.
+```powershell
+.\.build-env\Scripts\python.exe -m unittest discover -s tests -q
+.\.build-env\Scripts\python.exe tools/verify_examples.py
+```
 
-See [MVP delivery](docs/MVP_DELIVERY.md) for supported features and remaining gaps. The [legacy guide](docs/legacy/README.md) documents the older application only.
+For Windows packaging, also install `requirements-build.lock.txt`, prepare Inno
+Setup and the signed offline WebView2 installer, then run
+`build_preview_installer.ps1`. See the [installer build guide](docs/OFFLINE_INSTALLER.md).
+The ready-to-run 0.1.1 release remains usable independently of the source cleanup.

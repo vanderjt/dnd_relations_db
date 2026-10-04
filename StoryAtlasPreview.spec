@@ -5,8 +5,8 @@ from PyInstaller.utils.hooks import collect_all, copy_metadata
 root = Path(SPECPATH)
 datas, binaries, hiddenimports = collect_all('webview')
 datas += [(str(root / 'preview/dist'), 'preview/dist'),
-          (str(root / 'prototypes/phase2/greyhaven.json'), 'prototypes/phase2'),
-          (str(root / 'docs/MVP_DELIVERY.md'), 'documentation')]
+          (str(root / 'story_atlas/resources/greyhaven.json'), 'story_atlas/resources'),
+          (str(root / 'docs/USER_GUIDE.md'), 'documentation')]
 for package in ('pywebview', 'pythonnet', 'clr_loader', 'bottle', 'proxy_tools', 'cffi'):
     datas += copy_metadata(package)
 for name in ('sqlite3.dll', 'libffi-8.dll', 'ffi.dll'):

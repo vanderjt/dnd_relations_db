@@ -1,4 +1,4 @@
-"""Native React/pywebview preview. The Tkinter main.py remains independent."""
+"""Native React/pywebview host for Story Atlas."""
 import argparse
 import logging
 import os
@@ -99,7 +99,7 @@ def main():
         import webview
     except ImportError:
         raise SystemExit('Preview host missing. Use the launcher for your platform to set up dependencies.')
-    worker = PreviewWorker(args.home, root / 'prototypes' / 'phase2' / 'greyhaven.json')
+    worker = PreviewWorker(args.home, root / 'story_atlas' / 'resources' / 'greyhaven.json')
     if args.story:
         result = worker.call('open_story', {'path': str(args.story)})
         if not result['ok']:

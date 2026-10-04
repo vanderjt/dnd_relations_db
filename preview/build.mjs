@@ -11,6 +11,6 @@ await build({
 });
 await copyFile("index.html", "dist/index.html");
 for (const name of ["studio.css", "refinements.css", "type.css"])
-  await copyFile(`../prototypes/phase2/${name}`, `dist/${name}`);
+  await copyFile(`assets/${name}`, `dist/${name}`);
 for (const name of ["themes", "ornaments"])
-  await cp(`../prototypes/phase2/${name}`, `dist/${name}`, { recursive: true });
+  await cp(`assets/${name}`, `dist/${name}`, { recursive: true });

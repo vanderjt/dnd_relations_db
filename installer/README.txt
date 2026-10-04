@@ -9,7 +9,7 @@ Installing from this Git repository
      Git LFS: https://git-lfs.com/
 2. Open PowerShell in the folder where you want the repository, then run:
      git lfs install
-     git clone --branch phase2-ui-design https://github.com/vanderjt/dnd_relations_db.git
+     git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
      cd dnd_relations_db
      git lfs pull
 3. In File Explorer, open the repository's installer folder and double-click:
@@ -20,14 +20,14 @@ Installing from this Git repository
 
 If you already cloned the repository, open PowerShell in its main folder:
   git fetch origin
-  git switch phase2-ui-design
+  git switch codex/repo-housekeeping
   git pull --ff-only
   git lfs install
   git lfs pull
 Then run the Setup EXE in this installer folder as described above. Save or
 commit any local edits before switching branches or pulling updates.
 
-Use the phase2-ui-design branch: that is where this installer is published.
+Use the codex/repo-housekeeping branch: that is where this installer is published.
 Use a Git LFS clone instead of GitHub's Download ZIP. The installer is about
 228 MB; a tiny text file starting with "version https://git-lfs.github.com"
 is an LFS pointer. Run git lfs pull to download the real executable.

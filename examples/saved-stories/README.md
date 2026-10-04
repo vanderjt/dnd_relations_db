@@ -60,17 +60,10 @@ in the cast because this preview does not hide them before their first scene.
 Historical ties remain labeled after death instead of implying continued living
 interaction. One connection per pair combines roles where necessary.
 
-## Reproducibility and validation
+## Validation
 
-`tools/build_literary_examples.py` writes through the app's validated save service
-and refuses to overwrite existing files. Supply a new `--output` directory to
-regenerate. `tools/verify_literary_examples.py` checks SQLite integrity, references,
-every event snapshot, key timeline transitions and equality after closing and
-reopening both databases. These examples use the current `.atlas-preview` format;
-the older `.db` files in the parent folder belong to the legacy application.
-
-`tools/build_edgerunners_example.py` creates a new Edgerunners file or validates an
-existing file with `--verify-only`. To restore portraits in regenerated examples,
-`tools/add_example_portraits.py --prepare` downloads the manifest’s images and
-creates review sheets; after review, `--apply` backs up and adds missing portraits
-to the repository and default Stories-folder copies. Existing portraits are kept.
+Run `tools/verify_examples.py` with the current Python environment to check all
+three stories for SQLite integrity, timeline facts, and matching snapshots after
+closing and reopening. Portrait credits are recorded in `portrait-sources.json`
+and inside the illustrated story files. All examples use the current
+`.atlas-preview` format.

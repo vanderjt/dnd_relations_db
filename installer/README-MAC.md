@@ -13,7 +13,7 @@ have been checked on Windows, but a native Mac launch has not been tested.
    installer by setting `GIT_LFS_SKIP_SMUDGE` for the clone:
 
    ```bash
-   GIT_LFS_SKIP_SMUDGE=1 git clone --branch phase2-ui-design https://github.com/vanderjt/dnd_relations_db.git
+   GIT_LFS_SKIP_SMUDGE=1 git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
    cd dnd_relations_db
    ```
 

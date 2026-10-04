@@ -37,7 +37,7 @@ class PreviewPlatformTests(unittest.TestCase):
                             patch.object(preview_main, 'PreviewWorker', return_value=worker) as factory, \
                             patch.dict('sys.modules', {'webview': webview}):
                         preview_main.main()
-                    factory.assert_called_once_with(root, root / 'prototypes' / 'phase2' / 'greyhaven.json')
+                    factory.assert_called_once_with(root, root / 'story_atlas' / 'resources' / 'greyhaven.json')
                     if platform == 'darwin':
                         webview.start.assert_called_once_with(debug=False)
                     else:

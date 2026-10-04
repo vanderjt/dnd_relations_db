@@ -23,7 +23,7 @@ parser.add_argument('--stage', choices=['create', 'reopen', 'sample', 'layout', 
 parser.add_argument('--width', type=int)
 parser.add_argument('--height', type=int)
 args = parser.parse_args()
-worker = PreviewWorker(args.home, ROOT / 'prototypes/phase2/greyhaven.json')
+worker = PreviewWorker(args.home, ROOT / 'story_atlas/resources/greyhaven.json')
 bridge = PreviewBridge(worker)
 window = webview.create_window('Story Atlas Preview — native smoke', str(ROOT / 'preview/dist/index.html'),
                               js_api=bridge, width=args.width or (900 if args.stage == 'layout' else 1280),

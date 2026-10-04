@@ -1,4 +1,4 @@
-"""Isolated preview format. No production migrations or legacy transaction owners.
+"""Current Story Atlas SQLite story format.
 
 Only PreviewWorker may own this connection in the desktop application. Domain
 commands each commit facts, revision, receipt, audit, and draft cleanup together.
@@ -15,7 +15,7 @@ from .profile_history import FIELDS, SCOPES, resolve_profile
 from .relationship_semantics import normalize, check_duplicate
 
 APPLICATION_ID = 0x53415056  # SAPV
-FORMAT_VERSION = 10002  # Also rejected by older Tkinter migration code.
+FORMAT_VERSION = 10002
 WORLD_FIELDS = ('species', 'role', 'faction', 'location', 'language', 'belief', 'title')
 
 
