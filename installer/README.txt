@@ -91,7 +91,17 @@ Legacy Tkinter stories and browser-prototype edits are not imported by this
 preview. Existing preview limitations remain; this package adds installation,
 not new editing features.
 
-Verification, October 2, 2026
+Verification, October 3, 2026 (0.1.1)
+Production frontend build and 34 focused Python tests passed. All three saved
+examples passed integrity and close/reopen checks. An isolated installation
+test passed install, update, uninstall, and reinstall using the frozen app
+payload. A test story, backup, and user-edited example remained byte-for-byte
+unchanged. Test registration and app files were removed afterward. The manager
+validated the published installer checksum. The isolated lifecycle test omits
+the WebView2 bootstrapper; clean-machine runtime testing remains outstanding.
+This release includes the story scrolling and notification dismissal fixes.
+
+Earlier verification, October 2, 2026 (0.1.0)
 Production frontend build and 31 focused Python tests passed. Saved examples
 passed database integrity, timeline, and close/reopen checks. Setup installed
 successfully on the development PC. Desktop/Start Menu shortcuts were created,

@@ -53,6 +53,16 @@ run `Launch Story Atlas.command` to refresh dependencies and built assets; see
 
 ## Acceptance evidence
 
+On October 3, 2026, release 0.1.1 passed the frontend build, 34 focused Python
+tests, and all three example-story checks. The installation manager verified
+the production Setup checksum. `tools/verify_installer_lifecycle.py` passed
+install, update, uninstall, and reinstall with a unique test AppId and disposable
+app/data directories. Stories, backups, and an edited included example remained
+byte-for-byte unchanged, and the test app registration was removed. This test
+uses the real frozen app payload but omits the WebView2 bootstrapper; it does
+not verify missing-runtime installation. Evidence lives in ignored
+`build-verification/lifecycle-*` directories.
+
 On October 2, 2026 the frontend build and 28 focused Python tests passed.
 The frozen app loaded its bundled sample. The generated installer returned
 exit code 0, and both shortcut files were verified. The installed executable

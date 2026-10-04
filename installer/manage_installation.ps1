@@ -25,8 +25,13 @@ function Get-InstalledUninstaller {
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{B1A827F6-93A7-4365-A494-D793125179DA}_is1'
     if (!(Test-Path -LiteralPath $key)) { return $null }
     $entry = Get-ItemProperty -LiteralPath $key
-    # Inno records the installed directory even if the user chose a custom path.
-    $uninstaller = Join-Path $entry.InstallLocation 'unins000.exe'
+    # Inno may choose unins001.exe after a reinstall; use its registered command.
+    $match = [regex]::Match($entry.UninstallString, '^"([^"\r\n]+\\unins[0-9]+\.exe)"$')
+    if (!$match.Success) { throw 'The registered uninstall command is invalid. Use Windows Settings to uninstall.' }
+    $uninstaller = $match.Groups[1].Value
+    $parent = [IO.Path]::GetFullPath((Split-Path -Parent $uninstaller)).TrimEnd('\')
+    $installed = [IO.Path]::GetFullPath($entry.InstallLocation).TrimEnd('\')
+    if ($parent -ne $installed) { throw 'The registered uninstaller is outside the app installation directory.' }
     if (!(Test-Path -LiteralPath $uninstaller -PathType Leaf)) {
         throw 'The registered uninstaller is missing. Use Install/update to repair the app first.'
     }
