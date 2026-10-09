@@ -3,6 +3,7 @@
 Only PreviewWorker may own this connection in the desktop application. Domain
 commands each commit facts, revision, receipt, audit, and draft cleanup together.
 """
+
 from pathlib import Path
 import hashlib
 import json
@@ -20,31 +21,51 @@ WORLD_FIELDS = ('species', 'role', 'faction', 'location', 'language', 'belief', 
 
 
 class Conflict(ValueError):
+    """The saved revision or recovered draft no longer matches the editor."""
+
     pass
 
 
 def encoded(value):
+    """Use stable JSON for stored values and idempotency fingerprints."""
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
 
 
 def text(value, label, required=False):
-    if not isinstance(value, str) or len(value) > 200000 or (required and not value.strip()):
+    """Validate authored text without silently trimming its stored value."""
+    if (
+        not isinstance(value, str)
+        or len(value) > 200000
+        or (required and not value.strip())
+    ):
         raise ValueError(f'Enter {label}{" (required)" if required else " as text"}.')
     return value
 
 
 class PreviewStore:
+    """Read and write one supported story file on its owning worker thread."""
+
     def __init__(self, path):
         self.path = Path(path).resolve()
         # mode=rw must never create a missing path on Open.
-        self.connection = sqlite3.connect(self.path.as_uri() + '?mode=rw', uri=True, timeout=10)
+        self.connection = sqlite3.connect(
+            self.path.as_uri() + '?mode=rw', uri=True, timeout=10
+        )
         self.connection.row_factory = sqlite3.Row
         try:
-            if (self.connection.execute('PRAGMA application_id').fetchone()[0] != APPLICATION_ID
-                    or self.connection.execute('PRAGMA user_version').fetchone()[0] != FORMAT_VERSION):
-                raise ValueError('This is not a supported Story Atlas Preview story. Open a .atlas-preview file; legacy import is not available.')
+            if (
+                self.connection.execute('PRAGMA application_id').fetchone()[0]
+                != APPLICATION_ID
+                or self.connection.execute('PRAGMA user_version').fetchone()[0]
+                != FORMAT_VERSION
+            ):
+                raise ValueError(
+                    'This is not a supported Story Atlas Preview story. Open a .atlas-preview file; legacy import is not available.'
+                )
             if self.connection.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
-                raise ValueError('This story failed its database integrity check. Restore a backup.')
+                raise ValueError(
+                    'This story failed its database integrity check. Restore a backup.'
+                )
             self.connection.execute('PRAGMA foreign_keys=ON')
             self.connection.execute('PRAGMA synchronous=FULL')
         except Exception:
@@ -53,6 +74,7 @@ class PreviewStore:
 
     @classmethod
     def create(cls, path, title, sample=None):
+        """Create a new story, optionally translating sample snapshots to history."""
         text(title, 'a story title', True)
         path = Path(path)
         # Exclusive reservation: never overwrite a user's story.
@@ -95,39 +117,113 @@ class PreviewStore:
             with connection:
                 connection.execute(f'PRAGMA application_id={APPLICATION_ID}')
                 connection.execute(f'PRAGMA user_version={FORMAT_VERSION}')
-                connection.execute('INSERT INTO metadata VALUES(1,?,0,?)', (title, str(uuid.uuid4())))
-                chapters = sample['chapters'] if sample else [{'id': 1, 'title': 'Chapter 1', 'summary': '', 'sequence': 1}]
-                events = sample['events'] if sample else [{'id': 1, 'title': 'Opening scene', 'summary': '', 'sequence': 1, 'chapter_id': 1}]
+                connection.execute(
+                    'INSERT INTO metadata VALUES(1,?,0,?)', (title, str(uuid.uuid4()))
+                )
+                chapters = (
+                    sample['chapters']
+                    if sample
+                    else [{'id': 1, 'title': 'Chapter 1', 'summary': '', 'sequence': 1}]
+                )
+                events = (
+                    sample['events']
+                    if sample
+                    else [
+                        {
+                            'id': 1,
+                            'title': 'Opening scene',
+                            'summary': '',
+                            'sequence': 1,
+                            'chapter_id': 1,
+                        }
+                    ]
+                )
                 for row in chapters:
-                    connection.execute('INSERT INTO chapters VALUES(?,?,?,?)', (row['id'], row['title'], row['summary'], row['sequence']))
+                    connection.execute(
+                        'INSERT INTO chapters VALUES(?,?,?,?)',
+                        (row['id'], row['title'], row['summary'], row['sequence']),
+                    )
                 for row in events:
-                    connection.execute('INSERT INTO story_events(id,chapter_id,title,summary,sequence,status) VALUES(?,?,?,?,?,?)',
-                                       (row['id'], row['chapter_id'], row['title'], row['summary'], row['sequence'], '' if sample else 'Planned'))
+                    connection.execute(
+                        'INSERT INTO story_events(id,chapter_id,title,summary,sequence,status) VALUES(?,?,?,?,?,?)',
+                        (
+                            row['id'],
+                            row['chapter_id'],
+                            row['title'],
+                            row['summary'],
+                            row['sequence'],
+                            '' if sample else 'Planned',
+                        ),
+                    )
                 for row in (sample or {}).get('characters', []):
-                    base = {key: str(row.get(key, '') or '') for key in FIELDS}
+                    baseline = {key: str(row.get(key, '') or '') for key in FIELDS}
                     for key in WORLD_FIELDS:
-                        if base[key]:
-                            connection.execute('INSERT OR IGNORE INTO world_entries(category,name) VALUES(?,?)', (key, base[key]))
-                            ident = connection.execute('SELECT id FROM world_entries WHERE category=? AND name=?', (key, base[key])).fetchone()[0]
-                            base[key] = f'@world:{ident}'
-                    connection.execute('INSERT INTO characters VALUES(?,?)', (row['id'], encoded(base)))
+                        if baseline[key]:
+                            connection.execute(
+                                'INSERT OR IGNORE INTO world_entries(category,name) VALUES(?,?)',
+                                (key, baseline[key]),
+                            )
+                            record_id = connection.execute(
+                                'SELECT id FROM world_entries WHERE category=? AND name=?',
+                                (key, baseline[key]),
+                            ).fetchone()[0]
+                            baseline[key] = f'@world:{record_id}'
+                    connection.execute(
+                        'INSERT INTO characters VALUES(?,?)',
+                        (row['id'], encoded(baseline)),
+                    )
                 if sample:
                     # Preserve every source record and only author real snapshot transitions.
-                    state_keys = ('source_id', 'target_id', 'kind', 'notes', 'semantics', 'inverse_label', 'category')
+                    state_keys = (
+                        'source_id',
+                        'target_id',
+                        'kind',
+                        'notes',
+                        'semantics',
+                        'inverse_label',
+                        'category',
+                    )
+
                     def state(row):
                         return {key: row.get(key, '') for key in state_keys}
-                    previous = {row['id']: state(row) for row in sample['opening_relationships']}
-                    all_rows = {row['id']: row for rows in sample['relationships'].values() for row in rows}
-                    all_rows.update({row['id']: row for row in sample['opening_relationships']})
-                    for ident, row in all_rows.items():
-                        connection.execute('INSERT INTO connections VALUES(?,?,?,?)',
-                            (ident, row['source_id'], row['target_id'], encoded(previous.get(ident))))
+
+                    previous = {
+                        row['id']: state(row) for row in sample['opening_relationships']
+                    }
+                    all_rows = {
+                        row['id']: row
+                        for rows in sample['relationships'].values()
+                        for row in rows
+                    }
+                    all_rows.update(
+                        {row['id']: row for row in sample['opening_relationships']}
+                    )
+                    for record_id, row in all_rows.items():
+                        connection.execute(
+                            'INSERT INTO connections VALUES(?,?,?,?)',
+                            (
+                                record_id,
+                                row['source_id'],
+                                row['target_id'],
+                                encoded(previous.get(record_id)),
+                            ),
+                        )
                     for event in events:
-                        current = {row['id']: state(row) for row in sample['relationships'][str(event['id'])]}
-                        for ident in previous.keys() | current.keys():
-                            if previous.get(ident) != current.get(ident):
-                                connection.execute('INSERT INTO connection_history VALUES(?,?,?,?)',
-                                    (ident, event['id'], encoded(current.get(ident)), 'carry_forward'))
+                        current = {
+                            row['id']: state(row)
+                            for row in sample['relationships'][str(event['id'])]
+                        }
+                        for record_id in previous.keys() | current.keys():
+                            if previous.get(record_id) != current.get(record_id):
+                                connection.execute(
+                                    'INSERT INTO connection_history VALUES(?,?,?,?)',
+                                    (
+                                        record_id,
+                                        event['id'],
+                                        encoded(current.get(record_id)),
+                                        'carry_forward',
+                                    ),
+                                )
                         previous = current
             connection.close()
             return cls(path)
@@ -147,30 +243,57 @@ class PreviewStore:
         return self.connection.execute('SELECT revision FROM metadata').fetchone()[0]
 
     def exists(self, table, ident):
-        if type(ident) is not int or not self.connection.execute(f'SELECT 1 FROM {table} WHERE id=?', (ident,)).fetchone():
-            raise ValueError(f'Choose an existing {table.replace("story_", "").rstrip("s")}.')
+        """Validate a record ID; table names come only from internal callers."""
+        if (
+            type(ident) is not int
+            or not self.connection.execute(
+                f'SELECT 1 FROM {table} WHERE id=?', (ident,)
+            ).fetchone()
+        ):
+            raise ValueError(
+                f'Choose an existing {table.replace("story_", "").rstrip("s")}.'
+            )
 
     def events(self):
         return self.rows('SELECT * FROM story_events ORDER BY sequence,id')
 
     def profile(self, character_id, event_id):
+        """Return display values, stable World references, and field provenance."""
         self.exists('characters', character_id)
         self.exists('story_events', event_id)
-        base = json.loads(self.connection.execute('SELECT baseline FROM characters WHERE id=?', (character_id,)).fetchone()[0])
-        history = self.rows('SELECT * FROM profile_history WHERE character_id=?', (character_id,))
-        resolved = resolve_profile(base, history, self.events(), event_id)
-        raw = dict(resolved['values'])
+        baseline = json.loads(
+            self.connection.execute(
+                'SELECT baseline FROM characters WHERE id=?', (character_id,)
+            ).fetchone()[0]
+        )
+        history = self.rows(
+            'SELECT * FROM profile_history WHERE character_id=?', (character_id,)
+        )
+        resolved = resolve_profile(baseline, history, self.events(), event_id)
+        # Editors save stable World IDs; the workspace displays current names.
+        raw_values = dict(resolved['values'])
         for key in WORLD_FIELDS:
-            value = raw[key]
+            value = raw_values[key]
             if value.startswith('@world:'):
-                ident = int(value.split(':')[1])
-                entry = self.connection.execute('SELECT name FROM world_entries WHERE id=? AND category=?', (ident, key)).fetchone()
-                if not entry:
-                    raise ValueError('A World assignment is missing. Restore a complete backup.')
-                resolved['values'][key] = entry[0]
-        return dict(character_id=character_id, event_id=event_id, raw_values=raw, **resolved)
+                world_entry_id = int(value.split(':')[1])
+                world_entry = self.connection.execute(
+                    'SELECT name FROM world_entries WHERE id=? AND category=?',
+                    (world_entry_id, key),
+                ).fetchone()
+                if not world_entry:
+                    raise ValueError(
+                        'A World assignment is missing. Restore a complete backup.'
+                    )
+                resolved['values'][key] = world_entry[0]
+        return dict(
+            character_id=character_id,
+            event_id=event_id,
+            raw_values=raw_values,
+            **resolved,
+        )
 
     def workspace(self, event_id=None):
+        """Read the whole workspace from one consistent database snapshot."""
         if self.connection.in_transaction:
             return self._workspace(event_id)
         with self.connection:
@@ -178,38 +301,70 @@ class PreviewStore:
             return self._workspace(event_id)
 
     def _workspace(self, event_id=None):
+        """Assemble workspace data inside the caller's read/write transaction."""
         events = self.events()
         context = self.preference('context') or {}
         event_id = event_id or context.get('event_id') or events[0]['id']
         self.exists('story_events', event_id)
-        cast = [dict(id=row['id'], portrait=self.preference(f"portrait:{row['id']}") or '', **self.profile(row['id'], event_id)['values'])
-                for row in self.rows('SELECT id FROM characters ORDER BY id')]
-        return dict(**dict(self.connection.execute('SELECT * FROM metadata').fetchone()), path=str(self.path),
-                    chapters=self.rows('SELECT * FROM chapters ORDER BY sequence'), events=events,
-                    participants=self.rows('SELECT * FROM event_participants'), characters=cast, event_id=event_id,
-                    context=context, drafts=self.rows('SELECT key,payload FROM drafts'),
-                    theme=self.preference('theme') or 'storybook',
-                    connections=self.connections(event_id), world=self.rows('SELECT * FROM world_entries ORDER BY category,name,id'),
-                    graph=self.preference('graph') or {},
-                    capabilities={'relationships': True, 'world': True})
+        characters = [
+            dict(
+                id=row['id'],
+                portrait=self.preference(f"portrait:{row['id']}") or '',
+                **self.profile(row['id'], event_id)['values'],
+            )
+            for row in self.rows('SELECT id FROM characters ORDER BY id')
+        ]
+        return dict(
+            **dict(self.connection.execute('SELECT * FROM metadata').fetchone()),
+            path=str(self.path),
+            chapters=self.rows('SELECT * FROM chapters ORDER BY sequence'),
+            events=events,
+            participants=self.rows('SELECT * FROM event_participants'),
+            characters=characters,
+            event_id=event_id,
+            context=context,
+            drafts=self.rows('SELECT key,payload FROM drafts'),
+            theme=self.preference('theme') or 'storybook',
+            connections=self.connections(event_id),
+            world=self.rows('SELECT * FROM world_entries ORDER BY category,name,id'),
+            graph=self.preference('graph') or {},
+            capabilities={'relationships': True, 'world': True},
+        )
 
     def preference(self, key):
-        row = self.connection.execute('SELECT payload FROM preferences WHERE key=?', (key,)).fetchone()
+        row = self.connection.execute(
+            'SELECT payload FROM preferences WHERE key=?', (key,)
+        ).fetchone()
         return json.loads(row[0]) if row else None
 
     def save_preference(self, key, payload):
-        if key not in ('context', 'theme', 'graph') or not isinstance(payload, (dict, str)):
+        """Persist view state without creating a story revision or audit entry."""
+        if key not in ('context', 'theme', 'graph') or not isinstance(
+            payload, (dict, str)
+        ):
             raise ValueError('Invalid view preference.')
         with self.connection:
-            self.connection.execute('INSERT INTO preferences VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload', (key, encoded(payload)))
+            self.connection.execute(
+                'INSERT INTO preferences VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload',
+                (key, encoded(payload)),
+            )
 
     def save_draft(self, key, payload):
-        if not isinstance(key, str) or len(key) > 150 or not isinstance(payload, dict) or payload.get('version') != 1:
+        """Commit recoverable editor state separately from authored story facts."""
+        if (
+            not isinstance(key, str)
+            or len(key) > 150
+            or not isinstance(payload, dict)
+            or payload.get('version') != 1
+        ):
             raise ValueError('Unsupported draft format.')
         if len(encoded(payload)) > 5000000:
             raise ValueError('Draft is too large.')
         with self.connection:
-            self.connection.execute('INSERT INTO drafts VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload', (key, encoded(payload)))
+            self.connection.execute(
+                'INSERT INTO drafts VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload',
+                (key, encoded(payload)),
+            )
         return {'durable': True}
 
     def discard_draft(self, key):
@@ -217,56 +372,109 @@ class PreviewStore:
             self.connection.execute('DELETE FROM drafts WHERE key=?', (key,))
 
     def get_draft(self, key):
-        row = self.connection.execute('SELECT payload FROM drafts WHERE key=?', (key,)).fetchone()
+        row = self.connection.execute(
+            'SELECT payload FROM drafts WHERE key=?', (key,)
+        ).fetchone()
         return json.loads(row[0]) if row else None
 
-    def write(self, command, payload, expected_revision, request_id, draft_key=None, draft_id=None):
+    def write(
+        self,
+        command,
+        payload,
+        expected_revision,
+        request_id,
+        draft_key=None,
+        draft_id=None,
+    ):
+        """Commit a domain command and its revision, audit, receipt, and draft.
+
+        Every part shares one transaction, so any validation or storage failure
+        rolls back the entire save. Receipts make an identical retry safe.
+        """
         if not isinstance(request_id, str) or not 8 <= len(request_id) <= 120:
             raise ValueError('A unique request ID is required.')
-        fingerprint = hashlib.sha256(encoded([command, payload, expected_revision, draft_key, draft_id]).encode()).hexdigest()
+        fingerprint = hashlib.sha256(
+            encoded([command, payload, expected_revision, draft_key, draft_id]).encode()
+        ).hexdigest()
         with self.connection:
+            # Reserve the writer before checking revision or changing facts.
             self.connection.execute('BEGIN IMMEDIATE')
-            receipt = self.connection.execute('SELECT * FROM receipts WHERE request_id=?', (request_id,)).fetchone()
-            if receipt:
-                if receipt['fingerprint'] != fingerprint:
-                    raise ValueError('This request ID was already used for different content.')
-                return json.loads(receipt['result'])
-            if type(expected_revision) is not int or expected_revision != self.revision():
-                raise Conflict('The story changed since this editor opened. Your draft is kept. Reload saved values, then review your pending edits before retrying.')
-            handlers = {'create_character': self._create_character, 'save_profile': self._save_profile,
-                        'save_event': self._save_event, 'save_chapter': self._save_chapter, 'save_title': self._save_title,
-                        'save_connection': self._save_connection, 'save_world': self._save_world,
-                        'save_portrait': self._save_portrait}
+            existing_receipt = self.connection.execute(
+                'SELECT * FROM receipts WHERE request_id=?', (request_id,)
+            ).fetchone()
+            if existing_receipt:
+                # A completed retry is valid even after newer story revisions.
+                if existing_receipt['fingerprint'] != fingerprint:
+                    raise ValueError(
+                        'This request ID was already used for different content.'
+                    )
+                return json.loads(existing_receipt['result'])
+            if (
+                type(expected_revision) is not int
+                or expected_revision != self.revision()
+            ):
+                raise Conflict(
+                    'The story changed since this editor opened. Your draft is kept. Reload saved values, then review your pending edits before retrying.'
+                )
+            handlers = {
+                'create_character': self._create_character,
+                'save_profile': self._save_profile,
+                'save_event': self._save_event,
+                'save_chapter': self._save_chapter,
+                'save_title': self._save_title,
+                'save_connection': self._save_connection,
+                'save_world': self._save_world,
+                'save_portrait': self._save_portrait,
+            }
             if command not in handlers:
                 raise ValueError('This preview command is unavailable.')
             data = handlers[command](payload)
             self.connection.execute('UPDATE metadata SET revision=revision+1')
-            audit = {'character_id': payload['character_id'], 'has_portrait': bool(payload['image'])} if command == 'save_portrait' else payload
-            self.connection.execute('INSERT INTO activity(action,details) VALUES(?,?)', (command, encoded(audit)))
+            audit_details = (
+                {
+                    'character_id': payload['character_id'],
+                    'has_portrait': bool(payload['image']),
+                }
+                if command == 'save_portrait'
+                else payload
+            )
+            self.connection.execute(
+                'INSERT INTO activity(action,details) VALUES(?,?)',
+                (command, encoded(audit_details)),
+            )
             if draft_key:
                 # Only the matching editor can clear its own draft.
                 expected_key = self.draft_key(command, payload)
                 if draft_key != expected_key:
                     raise ValueError('The draft does not belong to this save.')
-                current = self.get_draft(draft_key)
-                if current and current.get('editor', {}).get('draft_id') != draft_id:
-                    raise Conflict('Another editor replaced this draft. Pending work is kept. Reopen and review the recovered draft before saving.')
+                current_draft = self.get_draft(draft_key)
+                if (
+                    current_draft
+                    and current_draft.get('editor', {}).get('draft_id') != draft_id
+                ):
+                    raise Conflict(
+                        'Another editor replaced this draft. Pending work is kept. Reopen and review the recovered draft before saving.'
+                    )
                 self.connection.execute('DELETE FROM drafts WHERE key=?', (draft_key,))
             result = {'revision': self.revision(), 'data': data}
-            self.connection.execute('INSERT INTO receipts VALUES(?,?,?)', (request_id, fingerprint, encoded(result)))
+            self.connection.execute(
+                'INSERT INTO receipts VALUES(?,?,?)',
+                (request_id, fingerprint, encoded(result)),
+            )
         return result
 
     @staticmethod
     def draft_key(command, payload):
+        """Identify the editor whose draft may be cleared by this command."""
         if command == 'save_profile':
             return f"profile:{payload['character_id']}:{payload['event_id']}"
         if command == 'save_connection':
             return f"connection:{payload.get('id', 'new')}:{payload['event_id']}"
         return f"{command}:{payload.get('id', 'new')}"
 
-    def _save_portrait(self, p):
-        self.exists('characters', p.get('character_id'))
-        image = p.get('image')
+    def _save_portrait(self, payload):
+        self.exists('characters', payload.get('character_id'))
+        image = payload.get('image')
         if not isinstance(image, str) or len(image) > 2800000:
             raise ValueError('Choose a portrait image under 2 MB after resizing.')
         if image:
@@ -274,199 +482,370 @@ class PreviewStore:
             if not image.startswith(prefix):
                 raise ValueError('Portraits must be converted to JPEG before saving.')
             try:
-                raw = base64.b64decode(image[len(prefix):], validate=True)
+                jpeg_bytes = base64.b64decode(image[len(prefix) :], validate=True)
             except (ValueError, binascii.Error):
                 raise ValueError('Invalid portrait image.') from None
-            if len(raw) > 2000000 or not raw.startswith(b'\xff\xd8\xff') or not raw.endswith(b'\xff\xd9'):
+            if (
+                len(jpeg_bytes) > 2000000
+                or not jpeg_bytes.startswith(b'\xff\xd8\xff')
+                or not jpeg_bytes.endswith(b'\xff\xd9')
+            ):
                 raise ValueError('Invalid or oversized portrait image.')
-        key = f"portrait:{p['character_id']}"
-        self.connection.execute('INSERT INTO preferences VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload', (key, encoded(image)))
-        return {'character_id': p['character_id']}
+        key = f"portrait:{payload['character_id']}"
+        self.connection.execute(
+            'INSERT INTO preferences VALUES(?,?) ON CONFLICT(key) DO UPDATE SET payload=excluded.payload',
+            (key, encoded(image)),
+        )
+        return {'character_id': payload['character_id']}
 
-    def _create_character(self, p):
-        name = text(p.get('name'), 'a character name', True)
-        summary = text(p.get('summary', ''), 'a summary')
-        self.exists('story_events', p.get('event_id'))
+    def _create_character(self, payload):
+        name = text(payload.get('name'), 'a character name', True)
+        summary = text(payload.get('summary', ''), 'a summary')
+        self.exists('story_events', payload.get('event_id'))
         baseline = {key: '' for key in FIELDS}
         baseline.update(name=name.strip(), summary=summary)
-        ident = self.connection.execute('INSERT INTO characters(baseline) VALUES(?)', (encoded(baseline),)).lastrowid
-        return self.profile(ident, p['event_id'])
+        character_id = self.connection.execute(
+            'INSERT INTO characters(baseline) VALUES(?)', (encoded(baseline),)
+        ).lastrowid
+        return self.profile(character_id, payload['event_id'])
 
-    def _save_profile(self, p):
-        self.exists('characters', p.get('character_id'))
-        self.exists('story_events', p.get('event_id'))
-        changes = p.get('changes')
+    def _save_profile(self, payload):
+        self.exists('characters', payload.get('character_id'))
+        self.exists('story_events', payload.get('event_id'))
+        changes = payload.get('changes')
         if not isinstance(changes, list) or not changes:
             raise ValueError('Choose at least one profile change.')
-        seen = set()
-        for row in changes:
-            if not isinstance(row, dict) or set(row) != {'field', 'value', 'scope'}:
+        seen_fields = set()
+        for change in changes:
+            if not isinstance(change, dict) or set(change) != {
+                'field',
+                'value',
+                'scope',
+            }:
                 raise ValueError('A profile change needs a field, value, and scope.')
-            key = row['field']
-            if not isinstance(key, str) or key not in FIELDS or key in seen or row['scope'] not in SCOPES:
+            field = change['field']
+            if (
+                not isinstance(field, str)
+                or field not in FIELDS
+                or field in seen_fields
+                or change['scope'] not in SCOPES
+            ):
                 raise ValueError('Choose each supported field once and a valid scope.')
-            text(row['value'], key, key == 'name')
-            value = self._world_value(key, row['value']) if key in WORLD_FIELDS else row['value']
-            seen.add(key)
-            self.connection.execute('''INSERT INTO profile_history VALUES(?,?,?,?,?)
+            text(change['value'], field, field == 'name')
+            value = (
+                self._world_value(field, change['value'])
+                if field in WORLD_FIELDS
+                else change['value']
+            )
+            seen_fields.add(field)
+            self.connection.execute(
+                '''INSERT INTO profile_history VALUES(?,?,?,?,?)
                 ON CONFLICT(character_id,event_id,field) DO UPDATE SET value=excluded.value,scope=excluded.scope''',
-                (p['character_id'], p['event_id'], key, value, row['scope']))
-        return self.profile(p['character_id'], p['event_id'])
+                (
+                    payload['character_id'],
+                    payload['event_id'],
+                    field,
+                    value,
+                    change['scope'],
+                ),
+            )
+        return self.profile(payload['character_id'], payload['event_id'])
 
-    def _save_title(self, p):
-        title = text(p.get('title'), 'a story title', True)
+    def _save_title(self, payload):
+        title = text(payload.get('title'), 'a story title', True)
         self.connection.execute('UPDATE metadata SET title=?', (title,))
         return {'title': title}
 
-    def _save_chapter(self, p):
-        title = text(p.get('title'), 'a chapter title', True)
-        summary = text(p.get('summary', ''), 'a chapter summary')
-        ident = p.get('id')
-        if ident is None:
-            ident = self.connection.execute('INSERT INTO chapters(title,summary,sequence) VALUES(?,?,(SELECT COALESCE(MAX(sequence),0)+1 FROM chapters))', (title, summary)).lastrowid
+    def _save_chapter(self, payload):
+        title = text(payload.get('title'), 'a chapter title', True)
+        summary = text(payload.get('summary', ''), 'a chapter summary')
+        chapter_id = payload.get('id')
+        if chapter_id is None:
+            chapter_id = self.connection.execute(
+                'INSERT INTO chapters(title,summary,sequence) VALUES(?,?,(SELECT COALESCE(MAX(sequence),0)+1 FROM chapters))',
+                (title, summary),
+            ).lastrowid
         else:
-            self.exists('chapters', ident)
-            self.connection.execute('UPDATE chapters SET title=?,summary=? WHERE id=?', (title, summary, ident))
-        return {'id': ident}
+            self.exists('chapters', chapter_id)
+            self.connection.execute(
+                'UPDATE chapters SET title=?,summary=? WHERE id=?',
+                (title, summary, chapter_id),
+            )
+        return {'id': chapter_id}
 
-    def _save_event(self, p):
-        self.exists('chapters', p.get('chapter_id'))
-        title = text(p.get('title'), 'an event title', True)
+    def _save_event(self, payload):
+        self.exists('chapters', payload.get('chapter_id'))
+        title = text(payload.get('title'), 'an event title', True)
         for field in ('summary', 'purpose', 'notes'):
-            text(p.get(field, ''), field)
-        status = p.get('status', '')
-        location = p.get('location_id')
-        if location is not None:
-            self.exists('world_entries', location)
-            if self.connection.execute('SELECT category FROM world_entries WHERE id=?', (location,)).fetchone()[0] != 'location':
+            text(payload.get(field, ''), field)
+        status = payload.get('status', '')
+        location_id = payload.get('location_id')
+        if location_id is not None:
+            self.exists('world_entries', location_id)
+            if (
+                self.connection.execute(
+                    'SELECT category FROM world_entries WHERE id=?', (location_id,)
+                ).fetchone()[0]
+                != 'location'
+            ):
                 raise ValueError('Choose a World location.')
         if status not in ('', 'Planned', 'Happened'):
             raise ValueError('Choose Planned, Happened, or Unclassified.')
-        participants = p.get('participants', [])
+        participants = payload.get('participants', [])
         if not isinstance(participants, list):
             raise ValueError('Choose participating characters.')
-        for ident in participants:
-            self.exists('characters', ident)
-        ident = p.get('id')
-        values = (title, p.get('summary', ''), status, p.get('purpose', ''), p.get('notes', ''))
-        if ident is None:
-            sequence = self.connection.execute('SELECT COALESCE(MAX(sequence),0)+1 FROM story_events').fetchone()[0]
-            ident = self.connection.execute('INSERT INTO story_events(title,summary,status,purpose,notes,chapter_id,sequence) VALUES(?,?,?,?,?,?,?)', (*values, p['chapter_id'], sequence)).lastrowid
+        for participant_id in participants:
+            self.exists('characters', participant_id)
+        event_id = payload.get('id')
+        values = (
+            title,
+            payload.get('summary', ''),
+            status,
+            payload.get('purpose', ''),
+            payload.get('notes', ''),
+        )
+        if event_id is None:
+            next_sequence = self.connection.execute(
+                'SELECT COALESCE(MAX(sequence),0)+1 FROM story_events'
+            ).fetchone()[0]
+            event_id = self.connection.execute(
+                'INSERT INTO story_events(title,summary,status,purpose,notes,chapter_id,sequence) VALUES(?,?,?,?,?,?,?)',
+                (*values, payload['chapter_id'], next_sequence),
+            ).lastrowid
             # Append within the chosen chapter. Stable event IDs preserve history.
-            ordered = self.rows('SELECT e.id FROM story_events e JOIN chapters c ON e.chapter_id=c.id ORDER BY c.sequence,e.sequence')
-            for i, row in enumerate(ordered, sequence + 1):
-                self.connection.execute('UPDATE story_events SET sequence=? WHERE id=?', (i, row['id']))
-            for i, row in enumerate(ordered, 1):
-                self.connection.execute('UPDATE story_events SET sequence=? WHERE id=?', (i, row['id']))
+            ordered_events = self.rows(
+                'SELECT e.id FROM story_events e JOIN chapters c ON e.chapter_id=c.id ORDER BY c.sequence,e.sequence'
+            )
+            # Move sequence numbers above the occupied range first, so the
+            # UNIQUE constraint remains valid while we renumber from one.
+            for position, row in enumerate(ordered_events, next_sequence + 1):
+                self.connection.execute(
+                    'UPDATE story_events SET sequence=? WHERE id=?',
+                    (position, row['id']),
+                )
+            for position, row in enumerate(ordered_events, 1):
+                self.connection.execute(
+                    'UPDATE story_events SET sequence=? WHERE id=?',
+                    (position, row['id']),
+                )
         else:
-            self.exists('story_events', ident)
-            current = self.connection.execute('SELECT chapter_id FROM story_events WHERE id=?', (ident,)).fetchone()[0]
-            if current != p['chapter_id']:
+            self.exists('story_events', event_id)
+            current_chapter_id = self.connection.execute(
+                'SELECT chapter_id FROM story_events WHERE id=?', (event_id,)
+            ).fetchone()[0]
+            if current_chapter_id != payload['chapter_id']:
                 raise ValueError('Moving events is not available in this preview.')
-            self.connection.execute('UPDATE story_events SET title=?,summary=?,status=?,purpose=?,notes=? WHERE id=?', (*values, ident))
-        self.connection.execute('DELETE FROM event_participants WHERE event_id=?', (ident,))
-        self.connection.execute('UPDATE story_events SET location_id=? WHERE id=?', (location, ident))
-        self.connection.executemany('INSERT INTO event_participants VALUES(?,?)', [(ident, c) for c in set(participants)])
-        return {'id': ident}
+            self.connection.execute(
+                'UPDATE story_events SET title=?,summary=?,status=?,purpose=?,notes=? WHERE id=?',
+                (*values, event_id),
+            )
+        self.connection.execute(
+            'DELETE FROM event_participants WHERE event_id=?', (event_id,)
+        )
+        self.connection.execute(
+            'UPDATE story_events SET location_id=? WHERE id=?', (location_id, event_id)
+        )
+        self.connection.executemany(
+            'INSERT INTO event_participants VALUES(?,?)',
+            [(event_id, character_id) for character_id in set(participants)],
+        )
+        return {'id': event_id}
 
     def _world_value(self, category, value):
+        """Keep an existing World reference or resolve exact text to one."""
         if not value:
             return ''
         if value.startswith('@world:'):
             try:
-                ident = int(value.split(':')[1])
+                world_entry_id = int(value.split(':')[1])
             except ValueError:
                 raise ValueError('Choose a valid World entry.')
-            self.exists('world_entries', ident)
-            if self.connection.execute('SELECT category FROM world_entries WHERE id=?', (ident,)).fetchone()[0] != category:
+            self.exists('world_entries', world_entry_id)
+            if (
+                self.connection.execute(
+                    'SELECT category FROM world_entries WHERE id=?', (world_entry_id,)
+                ).fetchone()[0]
+                != category
+            ):
                 raise ValueError('Choose a World entry from the matching list.')
-            return f'@world:{ident}'
+            return f'@world:{world_entry_id}'
         # Deliberate text conversion for the initial service/sample: exact spelling
         # only. Case/space/Unicode normalization collisions remain separate entries.
-        self.connection.execute('INSERT OR IGNORE INTO world_entries(category,name) VALUES(?,?)', (category, value))
-        ident = self.connection.execute('SELECT id FROM world_entries WHERE category=? AND name=?', (category, value)).fetchone()[0]
-        return f'@world:{ident}'
+        self.connection.execute(
+            'INSERT OR IGNORE INTO world_entries(category,name) VALUES(?,?)',
+            (category, value),
+        )
+        world_entry_id = self.connection.execute(
+            'SELECT id FROM world_entries WHERE category=? AND name=?',
+            (category, value),
+        ).fetchone()[0]
+        return f'@world:{world_entry_id}'
 
-    def _save_world(self, p):
-        category = p.get('category')
+    def _save_world(self, payload):
+        category = payload.get('category')
         if category not in WORLD_FIELDS:
             raise ValueError('Choose a supported World list.')
-        name = text(p.get('name'), 'a World entry name', True)
-        description = text(p.get('description', ''), 'a description')
-        ident = p.get('id')
-        if ident is None:
-            if self.connection.execute('SELECT 1 FROM world_entries WHERE category=? AND name=?', (category, name)).fetchone():
-                raise ValueError('That exact entry already exists. Open it to edit the description.')
-            ident = self.connection.execute('INSERT INTO world_entries(category,name,description) VALUES(?,?,?)', (category, name, description)).lastrowid
+        name = text(payload.get('name'), 'a World entry name', True)
+        description = text(payload.get('description', ''), 'a description')
+        world_entry_id = payload.get('id')
+        if world_entry_id is None:
+            if self.connection.execute(
+                'SELECT 1 FROM world_entries WHERE category=? AND name=?',
+                (category, name),
+            ).fetchone():
+                raise ValueError(
+                    'That exact entry already exists. Open it to edit the description.'
+                )
+            world_entry_id = self.connection.execute(
+                'INSERT INTO world_entries(category,name,description) VALUES(?,?,?)',
+                (category, name, description),
+            ).lastrowid
         else:
-            self.exists('world_entries', ident)
-            if self.connection.execute('SELECT category FROM world_entries WHERE id=?', (ident,)).fetchone()[0] != category:
+            self.exists('world_entries', world_entry_id)
+            if (
+                self.connection.execute(
+                    'SELECT category FROM world_entries WHERE id=?', (world_entry_id,)
+                ).fetchone()[0]
+                != category
+            ):
                 raise ValueError('An entry cannot move between World lists.')
-            if self.connection.execute('SELECT 1 FROM world_entries WHERE category=? AND name=? AND id!=?', (category, name, ident)).fetchone():
-                raise ValueError('That exact name already belongs to another entry. Entries are not merged.')
-            self.connection.execute('UPDATE world_entries SET name=?,description=? WHERE id=?', (name, description, ident))
-        return {'id': ident}
+            if self.connection.execute(
+                'SELECT 1 FROM world_entries WHERE category=? AND name=? AND id!=?',
+                (category, name, world_entry_id),
+            ).fetchone():
+                raise ValueError(
+                    'That exact name already belongs to another entry. Entries are not merged.'
+                )
+            self.connection.execute(
+                'UPDATE world_entries SET name=?,description=? WHERE id=?',
+                (name, description, world_entry_id),
+            )
+        return {'id': world_entry_id}
 
     def connections(self, event_id):
+        """Resolve active relationship states and their provenance at an event."""
         self.exists('story_events', event_id)
-        order = {row['id']: row['sequence'] for row in self.events()}
-        result = []
+        event_order = {
+            decision['id']: decision['sequence'] for decision in self.events()
+        }
+        resolved_connections = []
         for record in self.rows('SELECT * FROM connections ORDER BY id'):
             state = json.loads(record['baseline']) if record['baseline'] else None
-            source = None
-            history = self.rows('SELECT * FROM connection_history WHERE connection_id=?', (record['id'],))
-            for row in sorted(history, key=lambda r: order[r['event_id']]):
-                if order[row['event_id']] <= order[event_id] and (row['scope'] == 'carry_forward' or row['event_id'] == event_id):
-                    state = json.loads(row['state'])
-                    source = {'event_id': row['event_id'], 'scope': row['scope']}
+            origin = None
+            history = self.rows(
+                'SELECT * FROM connection_history WHERE connection_id=?',
+                (record['id'],),
+            )
+            for decision in sorted(
+                history, key=lambda decision: event_order[decision['event_id']]
+            ):
+                if event_order[decision['event_id']] <= event_order[event_id] and (
+                    decision['scope'] == 'carry_forward'
+                    or decision['event_id'] == event_id
+                ):
+                    state = json.loads(decision['state'])
+                    origin = {
+                        'event_id': decision['event_id'],
+                        'scope': decision['scope'],
+                    }
             if state is not None:
-                result.append(dict(state, id=record['id'], origin=source))
-        return result
+                resolved_connections.append(dict(state, id=record['id'], origin=origin))
+        return resolved_connections
 
-    def _save_connection(self, p):
-        self.exists('story_events', p.get('event_id'))
+    def _save_connection(self, payload):
+        self.exists('story_events', payload.get('event_id'))
         for key in ('source_id', 'target_id'):
-            self.exists('characters', p.get(key))
-        scope = p.get('scope')
+            self.exists('characters', payload.get(key))
+        scope = payload.get('scope')
         if scope not in SCOPES:
             raise ValueError('Choose event-only or carry-forward.')
         for key in ('kind', 'notes', 'inverse_label'):
-            text(p.get(key, ''), key, key == 'kind')
-        state = normalize(p['source_id'], p['target_id'], p['kind'], p.get('notes', ''),
-                          p.get('semantics', 'mutual'), p.get('inverse_label', ''), p.get('category', ''))
-        ident = p.get('id')
-        if ident is None:
-            if self.connection.execute('SELECT 1 FROM connections WHERE (source_id=? AND target_id=?) OR (source_id=? AND target_id=?)',
-                (state['source_id'], state['target_id'], state['target_id'], state['source_id'])).fetchone():
-                raise ValueError('This pair already has a connection record. Edit it at an event where it is active. Additional new connections for the same pair are unavailable.')
-            ident = self.connection.execute('INSERT INTO connections(source_id,target_id,baseline) VALUES(?,?,?)', (state['source_id'], state['target_id'], 'null')).lastrowid
+            text(payload.get(key, ''), key, key == 'kind')
+        relationship_state = normalize(
+            payload['source_id'],
+            payload['target_id'],
+            payload['kind'],
+            payload.get('notes', ''),
+            payload.get('semantics', 'mutual'),
+            payload.get('inverse_label', ''),
+            payload.get('category', ''),
+        )
+        connection_id = payload.get('id')
+        if connection_id is None:
+            if self.connection.execute(
+                'SELECT 1 FROM connections WHERE (source_id=? AND target_id=?) OR (source_id=? AND target_id=?)',
+                (
+                    relationship_state['source_id'],
+                    relationship_state['target_id'],
+                    relationship_state['target_id'],
+                    relationship_state['source_id'],
+                ),
+            ).fetchone():
+                raise ValueError(
+                    'This pair already has a connection record. Edit it at an event where it is active. Additional new connections for the same pair are unavailable.'
+                )
+            connection_id = self.connection.execute(
+                'INSERT INTO connections(source_id,target_id,baseline) VALUES(?,?,?)',
+                (
+                    relationship_state['source_id'],
+                    relationship_state['target_id'],
+                    'null',
+                ),
+            ).lastrowid
         else:
-            self.exists('connections', ident)
-            original = self.connection.execute('SELECT source_id,target_id FROM connections WHERE id=?', (ident,)).fetchone()
-            if set(original) != {state['source_id'], state['target_id']}:
-                raise ValueError('Choose the original two characters for this connection.')
-        self.connection.execute('''INSERT INTO connection_history VALUES(?,?,?,?)
+            self.exists('connections', connection_id)
+            original_endpoints = self.connection.execute(
+                'SELECT source_id,target_id FROM connections WHERE id=?',
+                (connection_id,),
+            ).fetchone()
+            if set(original_endpoints) != {
+                relationship_state['source_id'],
+                relationship_state['target_id'],
+            }:
+                raise ValueError(
+                    'Choose the original two characters for this connection.'
+                )
+        self.connection.execute(
+            '''INSERT INTO connection_history VALUES(?,?,?,?)
             ON CONFLICT(connection_id,event_id) DO UPDATE SET state=excluded.state,scope=excluded.scope''',
-            (ident, p['event_id'], encoded(state), scope))
+            (connection_id, payload['event_id'], encoded(relationship_state), scope),
+        )
+        # A carry-forward edit can conflict at a later event, not just this one.
+        # Validate the whole timeline before the outer write transaction commits.
         for event in self.events():
-            rows = self.connections(event['id'])
-            candidate = next((r for r in rows if r['id'] == ident), None)
+            active_connections = self.connections(event['id'])
+            candidate = next(
+                (
+                    relationship
+                    for relationship in active_connections
+                    if relationship['id'] == connection_id
+                ),
+                None,
+            )
             if candidate:
-                check_duplicate(candidate, rows, exclude=(ident,))
-        return next(row for row in self.connections(p['event_id']) if row['id'] == ident)
+                check_duplicate(candidate, active_connections, exclude=(connection_id,))
+        return next(
+            row
+            for row in self.connections(payload['event_id'])
+            if row['id'] == connection_id
+        )
 
     def backup(self, destination):
+        """Create and verify an exclusive SQLite backup, including WAL contents."""
         destination = Path(destination).resolve()
         with destination.open('xb'):
             pass
         try:
-            target = sqlite3.connect(destination)
+            backup_connection = sqlite3.connect(destination)
             try:
-                self.connection.backup(target)
-                if target.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
+                self.connection.backup(backup_connection)
+                if (
+                    backup_connection.execute('PRAGMA integrity_check').fetchone()[0]
+                    != 'ok'
+                ):
                     raise ValueError('Backup verification failed.')
             finally:
-                target.close()
+                backup_connection.close()
         except Exception:
             destination.unlink(missing_ok=True)
             raise

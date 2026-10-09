@@ -14,12 +14,10 @@ class PortraitTests(unittest.TestCase):
             def write(command, payload, revision=None):
                 return s.write(command, payload, s.revision() if revision is None else revision, uuid.uuid4().hex)
             ident = write('create_character', {'name':'Ada','event_id':1})['data']['character_id']
-            # Real JPEG produced by the same image format used by the frontend.
-            from PIL import Image
-            import io
-            buffer = io.BytesIO()
-            Image.new('RGB',(8,12),'red').save(buffer,format='JPEG')
-            image = 'data:image/jpeg;base64,' + base64.b64encode(buffer.getvalue()).decode()
+            # A tiny real JPEG exercises the browser's portable portrait format.
+            # Keeping the fixture in Git avoids a test-only imaging dependency.
+            fixture = Path(__file__).parent / 'fixtures' / 'portrait.jpg'
+            image = 'data:image/jpeg;base64,' + base64.b64encode(fixture.read_bytes()).decode()
             old_revision = s.revision()
             write('save_portrait', {'character_id':ident,'image':image})
             self.assertEqual(s.workspace()['characters'][0]['portrait'], image)

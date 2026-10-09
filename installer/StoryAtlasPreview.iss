@@ -1,10 +1,14 @@
-#define AppVersion "0.1.1"
+#ifndef AppVersion
+#error AppVersion must be supplied from VERSION by build_preview_installer.ps1
+#endif
 [Setup]
+; Keep this identity and per-user mode stable so updates reuse registration.
 AppId={{B1A827F6-93A7-4365-A494-D793125179DA}
 AppName=Story Atlas Preview
 AppVersion={#AppVersion}
 AppPublisher=Story Atlas
 DefaultDirName={localappdata}\Programs\Story Atlas Preview
+UsePreviousAppDir=yes
 DefaultGroupName=Story Atlas Preview
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
@@ -26,6 +30,7 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 
 [Files]
 Source: "..\dist\StoryAtlasPreview\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Install examples only once; user edits and all story data survive removal.
 Source: "..\examples\saved-stories\*.atlas-preview"; DestDir: "{localappdata}\StoryAtlasPreview\stories"; Flags: onlyifdoesntexist uninsneveruninstall
 Source: "..\examples\saved-stories\portrait-sources.json"; DestDir: "{localappdata}\StoryAtlasPreview\stories"; Flags: onlyifdoesntexist uninsneveruninstall
 Source: "..\build\installer-deps\MicrosoftEdgeWebView2RuntimeInstallerX64.exe"; Flags: dontcopy

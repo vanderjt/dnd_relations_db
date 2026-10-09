@@ -10,3 +10,8 @@ dist/
 build-verification/
 node_modules/
 preview/dist/
+
+# Isolated test environments and staged frontend output.
+.test-env*/
+preview/.dist-build/
+preview/.build-test-*/

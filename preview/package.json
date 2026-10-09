@@ -1,10 +1,11 @@
 {
   "name": "story-atlas-preview",
-  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && node build.mjs"
+    "build": "tsc --noEmit && node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:build": "node --test test/build.test.mjs"
   },
   "dependencies": {
     "react": "19.2.0",
