@@ -1,0 +1,94 @@
+name: Verify Windows installer
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - '.github/workflows/windows-installer.yml'
+      - 'tools/**'
+      - 'installer/*.ps1'
+      - 'installer/*.iss'
+      - 'story_atlas/**'
+      - 'preview/**'
+      - 'preview_main.py'
+      - 'requirements*.txt'
+      - 'VERSION'
+      - 'StoryAtlasPreview.spec'
+      - 'build_preview_installer.ps1'
+      - 'tests/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-installer-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  installer:
+    name: Build candidate and verify isolated lifecycle
+    # Same-repository work uses the branch push, avoiding a second expensive
+    # build for its PR event. Fork PRs run with read-only permissions and no secrets.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: windows-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      # Also applies when Git creates the historical source worktree.
+      GIT_LFS_SKIP_SMUDGE: '1'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.13'
+          architecture: x64
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: preview/package-lock.json
+      - name: Build real payloads, candidate, and lifecycle evidence
+        run: '& ./tools/verify_windows_ci.ps1'
+      - name: Retain candidate for review, never publish a release
+        if: always() && hashFiles('build/releases/*/release.json') != ''
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: windows-candidate-${{ github.event.pull_request.head.sha || github.sha }}
+          path: build/releases/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Retain verification evidence even when a stage fails
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: windows-verification-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            build-verification/ci/
+            build-verification/lifecycle-*/evidence.json
+            build-verification/lifecycle-*/*.log
+            build-verification/lifecycle-*/*.txt
+            build-verification/lifecycle-*/old/compiler.txt
+            build-verification/lifecycle-*/new/compiler.txt
+            build-verification/lifecycle-*/old/lifecycle.iss
+            build-verification/lifecycle-*/new/lifecycle.iss
+            build-verification/native-sample/*-result.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Verify tracked and untracked source remains clean
+        if: always()
+        run: |
+          $status = git status '--porcelain' '--untracked-files=all'
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect source status.' }
+          if ($status) { throw "Verification modified source: $status" }

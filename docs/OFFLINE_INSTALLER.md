@@ -97,6 +97,24 @@ logic and failure handling; it does not prove real Windows Setup behavior.
 Frontend checks and Python tests likewise do not prove native rendering.
 See [Contributing](../CONTRIBUTING.md#checks) for cross-platform limits.
 
+### Hosted Windows packaging and lifecycle CI
+
+The `Verify Windows installer` workflow builds an offline candidate on a
+GitHub-hosted Windows runner and retains the candidate and verification evidence
+as seven-day Actions artifacts. It never publishes a release or installs the
+production AppId. The hosted-only helper is `tools/verify_windows_ci.ps1`.
+
+The workflow rebuilds the recorded 0.1.1 source with the current pinned build
+requirements, then builds the current candidate and runs the isolated lifecycle
+checks below. This is not a byte-for-byte reproduction of the shipped 0.1.1 EXE.
+Evidence records source commits, dependency/compiler/runtime versions, payload
+hashes, and exact results. A frozen `--help` probe checks packaged startup only.
+When the runner has an interactive desktop session, a bounded source-native
+Greyhaven smoke also runs through real WebView2; otherwise evidence records the
+unsupported session explicitly. Attempted smoke failures fail the job, while
+artifacts are retained for inspection. None of these checks replaces the
+interactive and clean/offline release acceptance gates.
+
 ### Native app smoke
 
 `tools/preview_native_smoke.py` drives actual WebView2/bridge flows on Windows.
