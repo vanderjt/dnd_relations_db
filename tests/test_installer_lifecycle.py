@@ -50,10 +50,15 @@ from pathlib import Path
 import subprocess
 import sys
 from unittest.mock import patch
+# Windows may preload winreg through the standard library. Observe operations,
+# not the module cache, to detect import-time registry side effects.
+def reject_registry_access(event, args):
+    if event.startswith('winreg.'):
+        raise AssertionError('registry operation at import: ' + event)
+sys.addaudithook(reject_registry_access)
 with patch.object(Path, 'mkdir', side_effect=AssertionError('mkdir at import')), \\
      patch.object(subprocess, 'run', side_effect=AssertionError('process at import')):
     import tools.verify_installer_lifecycle
-assert 'winreg' not in sys.modules
 """
         result = subprocess.run([sys.executable, '-c', code], cwd=lifecycle.ROOT,
                                 capture_output=True, text=True, timeout=30)
