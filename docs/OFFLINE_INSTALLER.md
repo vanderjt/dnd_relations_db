@@ -112,7 +112,8 @@ hashes, and exact results. A frozen `--help` probe checks packaged startup only.
 When the runner has an interactive desktop session, a bounded source-native
 Greyhaven smoke also runs through real WebView2; otherwise evidence records the
 unsupported session explicitly. Attempted smoke failures fail the job, while
-artifacts are retained for inspection. None of these checks replaces the
+failure evidence is retained for inspection; candidate downloads are retained
+only after the verification job passes. None of these checks replaces the
 interactive and clean/offline release acceptance gates.
 
 ### Native app smoke

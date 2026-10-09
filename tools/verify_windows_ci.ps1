@@ -91,7 +91,8 @@ try {
         node = (& node --version)
         npm = (& npm.cmd --version)
         inno_compiler = $Compiler
-        inno_version = (Get-Item -LiteralPath $Compiler).VersionInfo.ProductVersion
+        inno_file_version = (Get-Item -LiteralPath $Compiler).VersionInfo.ProductVersion
+        inno_compiler_banner = ((& $Compiler '/?' 2>&1) -join "`n")
         inno_note = 'Use the compiler already supplied by the hosted image; historical release documentation used 6.7.3.'
         user_interactive = [Environment]::UserInteractive
         session_id = (Get-Process -Id $PID).SessionId

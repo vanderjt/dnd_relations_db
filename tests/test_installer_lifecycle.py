@@ -64,6 +64,12 @@ with patch.object(Path, 'mkdir', side_effect=AssertionError('mkdir at import')),
                                 capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_windows_powershell_gets_native_module_paths_without_mutating_parent(self):
+        parent = {'PSModulePath': 'Core modules', 'psmodulepath': 'another casing', 'KEEP': 'value'}
+        with patch.object(lifecycle.os, 'environ', parent):
+            self.assertEqual(lifecycle.powershell_environment(), {'KEEP': 'value'})
+            self.assertEqual(dict(lifecycle.os.environ), parent)
+
     def test_no_opt_in_refuses_before_reading_inputs(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error, \
                 patch.object(lifecycle, 'run_lifecycle') as run:

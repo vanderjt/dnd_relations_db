@@ -280,6 +280,17 @@ def wait_for_removed(sandbox, timeout=30):
     raise RuntimeError('Test uninstall registration or executable remains.')
 
 
+def powershell_environment():
+    """Let Windows PowerShell rebuild its own module paths.
+
+    A PowerShell 7 -> Python -> powershell.exe chain otherwise inherits Core
+    modules that Windows PowerShell 5.1 cannot load (including Get-FileHash).
+    This changes only the child environment, never persistent user settings.
+    """
+    return {key: value for key, value in os.environ.items()
+            if key.casefold() != 'psmodulepath'}
+
+
 def run_manager(powershell, release, action, sandbox, label):
     registration = read_registration(sandbox)
     if registration:
@@ -288,7 +299,8 @@ def run_manager(powershell, release, action, sandbox, label):
     wrapper.write_text(manager_wrapper(release / 'manage_installation.ps1', action, sandbox,
                                       sandbox.folder / (label + '.log')), encoding='utf-8-sig')
     result = subprocess.run([str(powershell), '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
-                             '-File', str(wrapper)], capture_output=True, text=True, timeout=300)
+                             '-File', str(wrapper)], capture_output=True, text=True, timeout=300,
+                            env=powershell_environment())
     (sandbox.folder / (label + '-manager.txt')).write_text(result.stdout + result.stderr, encoding='utf-8')
     require(result.returncode == 0, f'Manager {action} failed; see {label}-manager.txt.')
 
@@ -349,7 +361,7 @@ def run_lifecycle(args):
         # Dependency-free manager contracts include cancellation and custom paths.
         result = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
                                  '-File', str(ROOT / 'tests/test_installation_manager.ps1')],
-                                capture_output=True, text=True, timeout=120)
+                                capture_output=True, text=True, timeout=120, env=powershell_environment())
         (sandbox.folder / 'manager-contracts.txt').write_text(result.stdout + result.stderr, encoding='utf-8')
         require(result.returncode == 0, 'Manager contract tests failed; see manager-contracts.txt.')
         evidence['phases'].append('manager mocked contracts')
