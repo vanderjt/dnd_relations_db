@@ -286,7 +286,8 @@ class PreviewTests(unittest.TestCase):
             original = Path(opened['data']['path'])
             self.assertTrue(original.name.startswith('Story-CON- A - story-'))
             backup = worker.call('backup')['data']['path']
-            self.assertFalse(worker.call('open_story', {'path': str(self.home / 'missing')})['ok'])
+            with self.assertLogs(level='ERROR'):
+                self.assertFalse(worker.call('open_story', {'path': str(self.home / 'missing')})['ok'])
             self.assertEqual(worker.call('workspace')['data']['path'], str(original))
             restored = worker.call('restore', {'path': backup})
             self.assertTrue(restored['ok'])

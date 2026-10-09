@@ -1,113 +1,107 @@
-STORY ATLAS PREVIEW 0.1.1 — WINDOWS OFFLINE INSTALLER
+STORY ATLAS PREVIEW — WINDOWS OFFLINE INSTALLER
 
-Mac users: see README-MAC.md in this folder. Use Launch Story Atlas.command
-in the repository's main folder; this Windows Setup EXE does not run on macOS.
+BUNDLED RELEASE: 0.1.1
+Source commit: d6376bc388169bfe636115be5ea2ef444ff875b8
 
-Installing from this Git repository
-1. Use a Windows 10/11 x64 PC. Install Git and Git LFS if needed:
-     Git: https://git-scm.com/downloads/win
-     Git LFS: https://git-lfs.com/
-2. Open PowerShell in the folder where you want the repository, then run:
-     git lfs install
-     git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
-     cd dnd_relations_db
-     git lfs pull
-3. In File Explorer, open the repository's installer folder and double-click:
-     StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe
-4. Follow Setup and leave "Create a desktop shortcut" checked.
-5. Open Story Atlas Preview from the desktop or Start menu. You can also
-   double-click Launch Story Atlas.cmd in the repository's main folder.
+This EXE predates the current source. Pulling source changes does not rebuild
+or update an installed app. The release.json beside this file describes the
+bundled EXE, not the latest source. See ../docs/RELEASE_HISTORY.md for historical
+verification and remaining platform limits.
 
-If you already cloned the repository, open PowerShell in its main folder:
-  git fetch origin
-  git switch codex/repo-housekeeping
-  git pull --ff-only
+Mac users: see README-MAC.md. There is no standalone Mac installer.
+Source developers: see ../README.md and ../CONTRIBUTING.md. VS Code and direct
+preview_main.py launch remain supported independently of this installer.
+
+INSTALL FROM A DOWNLOADED FILE OR FLASH DRIVE
+1. Use a Windows 10/11 x64 PC.
+2. Run StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe.
+3. Follow Setup and select a desktop shortcut if wanted.
+4. Open Story Atlas Preview from the desktop or Start Menu.
+
+The flash drive can be removed afterward. Python and Node.js are not needed.
+Setup includes the app and Microsoft's offline WebView2 runtime, installing
+the runtime if missing. Installation is designed to work without a download;
+a clean Windows machine without WebView2 and with networking disabled still
+requires validation. Treat this as a friends-and-family preview.
+
+The app and Setup are not code-signed. The embedded runtime is signed by
+Microsoft. Obtain the package from a trusted source; a matching checksum
+checks file consistency but does not establish a publisher's identity.
+
+GET THE INSTALLER THROUGH GIT
+Install Git and Git LFS if needed:
+  https://git-scm.com/downloads/win
+  https://git-lfs.com/
+
+In PowerShell:
   git lfs install
+  git clone --branch codex/repo-housekeeping https://github.com/vanderjt/dnd_relations_db.git
+  cd dnd_relations_db
   git lfs pull
-Then run the Setup EXE in this installer folder as described above. Save or
-commit any local edits before switching branches or pulling updates.
 
-Use the codex/repo-housekeeping branch: that is where this installer is published.
-Use a Git LFS clone instead of GitHub's Download ZIP. The installer is about
-228 MB; a tiny text file starting with "version https://git-lfs.github.com"
-is an LFS pointer. Run git lfs pull to download the real executable.
-Internet access is needed to clone and download the installer. After that,
-Setup runs offline. Python and Node.js are not needed to install or run the app.
+Then run the Setup EXE in installer. GitHub's Download ZIP may contain only
+an LFS pointer. A tiny file starting with "version https://git-lfs.github.com"
+is not an executable; git lfs pull retrieves the actual package (about 228 MB).
+Internet access is needed for the clone/download, not normal app use.
 
-For friends installing from a flash drive
-1. Copy StoryAtlasPreview-0.1.1-Windows-x64-Offline-Setup.exe to the drive.
-2. On the destination Windows 10/11 x64 PC, double-click that file.
-3. Follow Setup and leave "Create a desktop shortcut" checked.
-4. Open Story Atlas Preview from the desktop or Start menu.
-5. Create a story, try Greyhaven, or use Open story for the included Frankenstein,
-   Dracula, and Cyberpunk: Edgerunners Season 1 examples in the Stories folder.
+If already on the release branch, save or commit local source edits first:
+  git pull --ff-only
+  git lfs pull
 
-The flash drive can be removed after installation. Python, Node.js, and an
-internet download are not required: Setup includes the app and Microsoft's
-offline WebView2 runtime, which it installs if missing.
+Do not discard local work or switch branches blindly to update an installer.
+A friend can instead give you the complete replacement Setup EXE directly.
 
-This preview installer is not code-signed. Windows may identify its publisher
-as unknown. The embedded Microsoft runtime is signed by Microsoft.
+UPDATE, UNINSTALL, OR REINSTALL
+1. Back up important work and close Story Atlas.
+2. Obtain the replacement release files, if a newer release has been published.
+3. Double-click Manage Story Atlas.cmd in this folder.
+4. Choose Install/update to replace the app without uninstalling it first.
+5. Reopen using the installed desktop or Start Menu shortcut.
 
-Updates, uninstall, and reinstall
-1. Save your edits and close Story Atlas.
-2. In PowerShell in the repository folder, run:
-     git pull --ff-only
-     git lfs pull
-3. Double-click Manage Story Atlas.cmd in this installer folder.
-4. Choose 1 (Install/update) and follow Setup. This replaces the installed
-   app without needing to uninstall it first. Your stories and backups remain.
-5. Reopen the installed app using its desktop or Start Menu shortcut.
+In-place updates can leave application files removed from a later release.
+Choose Uninstall/reinstall for a clean replacement of installer-tracked app
+files; separate stories and backups remain. Files you manually placed in the
+app folder may remain because they are not tracked by the uninstaller.
 
-The menu also provides option 2 (Uninstall) and option 3 (Uninstall/reinstall).
-Option 3 checks the new installer before removing the old app. Cancelling
-uninstall stops the reinstall. Each operation uses the normal Setup dialogs.
-You can also uninstall using Windows Settings > Apps > Story Atlas Preview,
+The menu also offers Uninstall and Uninstall/reinstall. Reinstall validates
+the replacement before removing a working installation. If uninstall is
+cancelled or incomplete, reinstall must stop. The manager uses the registered
+installation so custom app locations can be found.
+
+You can also uninstall through Windows Settings > Apps > Story Atlas Preview,
 or the Start Menu's Uninstall Story Atlas Preview shortcut.
 
-The menu checks the installer's SHA-256 against release.json before installing.
-Keep Manage Story Atlas.cmd, manage_installation.ps1, release.json, and the
-Setup EXE together if copying the manager to a flash drive. The Setup EXE
-alone still works when double-clicked.
+The manager verifies the EXE's SHA-256 against release.json before installing.
+Keep the installation-manager files in this folder together when copying them;
+the Setup EXE alone can still be run directly. The adjacent .sha256 records
+the same package checksum. The manager does not build source or download
+updates. Its displayed version and source commit identify the selected release.
 
-New source code does not automatically update the installed app. A new Setup
-build must be published for each release. The manager displays the bundled
-version and source commit so you can identify which release you are installing.
-Use installed desktop/Start Menu shortcuts for that release: the repository's
-root launcher can prefer source mode or a local developer package instead.
+Use installed shortcuts for the packaged release. Launch Story Atlas.cmd at
+the repository root prefers prepared source, then a local developer package,
+then the registered installed copy, and reports its selection.
 
-Your files
-The app installs for your Windows account in:
+YOUR STORIES AND BACKUPS
+The default per-user app installation directory is:
   %LOCALAPPDATA%\Programs\Story Atlas Preview
-Default story data and backups live separately in:
+Default story data and backups are separate:
   %LOCALAPPDATA%\StoryAtlasPreview
-Uninstalling the app preserves those story files. Use the app's backup command
-to transfer a story; copying the installer does not copy your personal stories.
-Setup includes the three authored example stories. Existing files with the same
-names are never overwritten, and uninstalling preserves the examples too.
-Frankenstein and Edgerunners include embedded offline portraits. Image credits
-are recorded in portrait-sources.json and inside each illustrated story.
-Legacy Tkinter stories and browser-prototype edits are not imported by this
-preview. Existing preview limitations remain; this package adds installation,
-not new editing features.
 
-Verification, October 3, 2026 (0.1.1)
-Production frontend build and 34 focused Python tests passed. All three saved
-examples passed integrity and close/reopen checks. An isolated installation
-test passed install, update, uninstall, and reinstall using the frozen app
-payload. A test story, backup, and user-edited example remained byte-for-byte
-unchanged. Test registration and app files were removed afterward. The manager
-validated the published installer checksum. The isolated lifecycle test omits
-the WebView2 bootstrapper; clean-machine runtime testing remains outstanding.
-This release includes the story scrolling and notification dismissal fixes.
+Uninstall preserves this separate data, including edited examples. Use the
+app's Back up story command to transfer work; copying the installer does not
+copy personal stories. Restore backup as a copy creates a separate working
+story rather than replacing the current one.
 
-Earlier verification, October 2, 2026 (0.1.0)
-Production frontend build and 31 focused Python tests passed. Saved examples
-passed database integrity, timeline, and close/reopen checks. Setup installed
-successfully on the development PC. Desktop/Start Menu shortcuts were created,
-the packaged Greyhaven sample opened, X closed the app, and the installed copy
-reopened that saved sample. Tests used disposable story data.
-A clean PC without WebView2 and an installation with networking disabled have
-not yet been tested. Treat this as a friends-and-family preview release.
+Source and installed copies share the default data root. Developers should
+use a disposable --home directory and copied story files for testing.
 
-The adjacent .sha256 file records the setup file's SHA-256 checksum.
+GREYHAVEN AND EXAMPLES
+Choose Try Greyhaven sample to create a fresh sample. Setup also places
+Frankenstein, Dracula, and Cyberpunk: Edgerunners Season 1 examples in the
+default Stories folder. Existing files with the same names are not overwritten.
+Open story edits the chosen file directly; copy an example before experimenting
+if you want to retain its original. Frankenstein and Edgerunners have embedded
+offline portraits. Credits are in portrait-sources.json and inside the stories.
+
+Legacy Tkinter .db stories and browser-prototype edits are not imported.
+For editing, drafts, backups, and scope rules, read ../docs/USER_GUIDE.md.
